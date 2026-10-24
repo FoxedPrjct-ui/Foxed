@@ -3,90 +3,232 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1f3d2b">
+<meta name="theme-color" content="#173226">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Catalogo">
-<title>Catalogo libri</title>
+<title>Catalogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-  :root { --verde:#1f3d2b; --ottone:#b08d3c; --carta:#f7f3ea; --inchiostro:#222; --bordeaux:#7a2e2e; --salvia:#dfe6dc; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--carta); color:var(--inchiostro); }
-  header { background:var(--verde); color:#fff; padding:14px 16px; padding-top:calc(14px + env(safe-area-inset-top)); display:flex; justify-content:space-between; align-items:center; }
-  header h1 { margin:0; font-size:20px; letter-spacing:.5px; }
-  header button { background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:8px; padding:6px 10px; font-size:14px; }
-  main { padding:16px; max-width:640px; margin:0 auto; padding-bottom:calc(30px + env(safe-area-inset-bottom)); }
-  label { display:block; margin-bottom:12px; font-size:14px; }
-  input, textarea { width:100%; padding:12px; font-size:16px; border:1px solid #c9c2b2; border-radius:10px; background:#fff; margin-top:4px; font-family:inherit; }
-  button { font-size:16px; border-radius:10px; border:none; padding:12px 16px; cursor:pointer; }
-  button:disabled { opacity:.5; }
-  .primario { background:var(--verde); color:#fff; width:100%; }
-  .azioni { display:flex; gap:10px; margin-bottom:14px; }
-  .azioni button { flex:1; padding:20px 8px; font-size:17px; background:var(--verde); color:#fff; }
-  .azioni button.foto { background:var(--ottone); }
-  .secondario { background:var(--salvia); color:var(--verde); width:100%; margin-top:8px; }
-  #form-cerca { display:flex; gap:8px; margin:6px 0 10px; }
-  #form-cerca input { margin:0; }
-  #form-cerca button { background:var(--ottone); color:#fff; }
-  #lettore { width:100%; border-radius:12px; overflow:hidden; margin-bottom:8px; }
-  #stato { font-size:14px; color:#555; min-height:20px; margin:6px 0; }
-  .errore { color:var(--bordeaux); }
-  h2 { font-size:15px; text-transform:uppercase; letter-spacing:1px; color:var(--verde); margin:22px 0 8px; border-bottom:2px solid var(--ottone); padding-bottom:4px; }
-  .scheda { background:#fff; border-radius:12px; padding:14px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,.08); border-left:5px solid var(--verde); }
-  .scheda.evidenza { border-left-color:var(--ottone); background:#fffaf0; }
-  .scheda.letto { border-left-color:#8a8a8a; }
-  .titolo { font-size:18px; font-weight:600; margin:0 0 2px; }
-  .autore { font-size:15px; margin:0 0 6px; }
-  .dati { font-size:14px; color:#555; margin:0 0 8px; }
-  .badge { display:inline-block; font-size:12px; padding:3px 8px; border-radius:20px; color:#fff; margin-bottom:8px; }
-  .b-verificata { background:var(--verde); }
-  .b-verificata_fonte_singola { background:#4f7a5c; }
-  .b-stima_ai { background:#8a8a8a; }
-  .mercato { font-size:14px; margin:6px 0; }
-  details { margin-top:8px; font-size:14px; }
-  summary { cursor:pointer; color:var(--verde); font-weight:600; }
-  details.trappole summary { color:var(--bordeaux); }
-  li { margin-bottom:6px; }
-  .avviso { font-size:13px; color:#6b5a2e; background:#f3ead2; padding:8px 10px; border-radius:8px; margin-top:8px; }
-  .riga { background:#fff; border-radius:8px; padding:8px 10px; margin-bottom:6px; font-size:14px; display:flex; gap:10px; align-items:flex-start; }
-  .riga img { width:48px; height:auto; border-radius:4px; flex-shrink:0; }
-  .riga a, .scheda a { color:var(--verde); }
-  .vuoto { font-size:14px; color:#666; }
-  #anteprima { width:100%; max-height:260px; object-fit:contain; border-radius:12px; background:#fff; margin-bottom:8px; }
+  :root {
+    --verde:#173226; --verde2:#24503b; --ottone:#b48a3a; --ottone-chiaro:#f4e9d0;
+    --carta:#f5f1e8; --bianco:#fffdf9; --inchiostro:#1d1d1b; --grigio:#6e6a60; --linea:#e6dfd0;
+    --bordeaux:#8a2f2f; --bordeaux-chiaro:#f7e6e3; --salvia:#e3e9df; --melanzana:#4a3550;
+    --ombra:0 1px 2px rgba(23,50,38,.06), 0 4px 14px rgba(23,50,38,.07);
+    --serif:"Fraunces", Georgia, serif; --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --tab:64px;
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; background:var(--carta); color:var(--inchiostro); font-family:var(--sans); font-size:15px; }
+  button { font-family:inherit; cursor:pointer; }
+  [hidden] { display:none !important; }
+
+  /* Header */
+  header { position:sticky; top:0; z-index:20; background:linear-gradient(135deg, var(--verde), var(--verde2)); color:#fff;
+    padding:calc(12px + env(safe-area-inset-top)) 18px 14px; display:flex; align-items:flex-end; justify-content:space-between; }
+  .marchio { font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:.3px; line-height:1; }
+  .marchio small { display:block; font-family:var(--sans); font-size:12px; font-weight:400; opacity:.75; margin-top:4px; letter-spacing:.4px; }
+  .esci { background:rgba(255,255,255,.12); color:#fff; border:none; border-radius:20px; padding:7px 12px; font-size:13px; }
+
+  main { padding:16px 16px calc(var(--tab) + 24px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
+
+  /* Login */
+  .login { max-width:380px; margin:12vh auto 0; background:var(--bianco); border-radius:20px; padding:26px 22px; box-shadow:var(--ombra); }
+  .login h2 { font-family:var(--serif); font-weight:600; margin:0 0 4px; font-size:24px; color:var(--verde); }
+  .login p.sotto { color:var(--grigio); margin:0 0 18px; font-size:14px; }
+  label { display:block; font-size:13px; color:var(--grigio); margin-bottom:12px; }
+  input, textarea, select { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--linea); border-radius:12px; background:#fff; margin-top:5px; font-family:inherit; color:var(--inchiostro); outline:none; }
+  input:focus, textarea:focus, select:focus { border-color:var(--ottone); box-shadow:0 0 0 3px rgba(180,138,58,.15); }
+  .btn { border:none; border-radius:12px; padding:13px 16px; font-size:15px; font-weight:600; }
+  .btn-verde { background:var(--verde); color:#fff; width:100%; }
+  .btn-tenue { background:var(--salvia); color:var(--verde); width:100%; margin-top:8px; }
+  .errore { color:var(--bordeaux); font-size:14px; }
+
+  /* Cerca */
+  .tessere { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+  .tessera { border:none; border-radius:18px; padding:20px 14px; color:#fff; text-align:left; box-shadow:var(--ombra); display:flex; flex-direction:column; gap:10px; min-height:118px; }
+  .tessera svg { width:30px; height:30px; }
+  .tessera b { font-size:16px; font-weight:600; }
+  .tessera span { font-size:12px; opacity:.8; font-weight:400; }
+  .tessera.barcode { background:linear-gradient(140deg, var(--verde), var(--verde2)); }
+  .tessera.foto { background:linear-gradient(140deg, #9c7429, var(--ottone)); }
+  .tessera:disabled { opacity:.5; }
+  .barra-ricerca { display:flex; gap:8px; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:4px 4px 4px 12px; box-shadow:var(--ombra); }
+  .barra-ricerca svg { width:18px; height:18px; color:var(--grigio); flex-shrink:0; }
+  .barra-ricerca input { border:none; margin:0; padding:10px 4px; box-shadow:none; background:transparent; }
+  .barra-ricerca button { background:var(--verde); color:#fff; border:none; border-radius:10px; padding:10px 14px; font-weight:600; font-size:14px; }
+  #lettore { width:100%; border-radius:16px; overflow:hidden; margin-bottom:8px; }
+  #anteprima { width:100%; max-height:240px; object-fit:contain; border-radius:16px; background:var(--bianco); margin:4px 0 8px; }
+  #stato { font-size:14px; color:var(--grigio); min-height:20px; margin:10px 2px; }
+
+  h3.sezione { font-family:var(--sans); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:var(--ottone); margin:22px 2px 10px; }
+  .riquadro { background:var(--bianco); border-radius:16px; padding:14px; margin-bottom:10px; box-shadow:var(--ombra); }
+  .riquadro.oro { background:#fffaf0; border:1px solid var(--ottone-chiaro); }
+  .etichetta { font-size:12px; color:var(--grigio); text-transform:uppercase; letter-spacing:.8px; margin:0 0 6px; }
+  .t-serif { font-family:var(--serif); font-size:19px; font-weight:600; margin:0 0 2px; line-height:1.25; }
+  .t-autore { margin:0 0 6px; }
+  .t-meta { color:var(--grigio); font-size:14px; margin:0 0 6px; }
+  a { color:var(--verde2); }
+  .avviso { font-size:13px; color:#6b5520; background:var(--ottone-chiaro); padding:9px 12px; border-radius:10px; margin:8px 0; }
+  .riga { display:flex; gap:12px; align-items:flex-start; background:var(--bianco); border-radius:12px; padding:10px 12px; margin-bottom:6px; font-size:14px; box-shadow:var(--ombra); }
+  .riga img { width:46px; border-radius:4px; flex-shrink:0; }
+  details > summary { cursor:pointer; color:var(--verde2); font-weight:600; font-size:14px; padding:6px 2px; }
+
+  /* Catalogo */
+  .strumenti { position:sticky; top:calc(64px + env(safe-area-inset-top)); z-index:10; background:var(--carta); padding:4px 0 8px; }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:10px 2px 4px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex-shrink:0; border:1px solid var(--linea); background:var(--bianco); color:var(--inchiostro); border-radius:20px; padding:7px 12px; font-size:13px; font-weight:500; }
+  .chip i { font-style:normal; color:var(--grigio); margin-left:4px; font-size:12px; }
+  .chip.attivo { background:var(--verde); color:#fff; border-color:var(--verde); }
+  .chip.attivo i { color:rgba(255,255,255,.7); }
+  .filtri { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
+  .filtri select { margin:0; padding:9px 12px; font-size:14px; border-radius:10px; }
+  .conteggio { font-size:13px; color:var(--grigio); margin:8px 2px 10px; }
+
+  .libro { display:flex; width:100%; text-align:left; border:none; background:var(--bianco); border-radius:16px; padding:0; margin-bottom:10px; box-shadow:var(--ombra); overflow:hidden; color:inherit; }
+  .libro:active { transform:scale(.99); }
+  .nastro { width:6px; flex-shrink:0; background:var(--verde); }
+  .s-verificata_fonte_singola .nastro { background:#5c8a6c; }
+  .s-stima_ai .nastro { background:#a9a397; }
+  .libro-corpo { flex:1; padding:13px 14px 12px; min-width:0; }
+  .libro-titolo { font-family:var(--serif); font-size:17px; font-weight:600; line-height:1.25; margin-bottom:3px; }
+  .libro-autore { font-size:14px; margin-bottom:4px; }
+  .libro-meta { font-size:13px; color:var(--grigio); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .libro-piede { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; align-items:center; }
+  .pill { font-size:11.5px; padding:3px 9px; border-radius:20px; background:var(--salvia); color:var(--verde); font-weight:500; }
+  .pill.prezzo { background:var(--ottone-chiaro); color:#6b5520; font-weight:600; }
+  .pill.stato-verificata { background:var(--verde); color:#fff; }
+  .pill.stato-verificata_fonte_singola { background:#5c8a6c; color:#fff; }
+  .pill.stato-stima_ai { background:#a9a397; color:#fff; }
+  .vuoto { color:var(--grigio); font-size:14px; text-align:center; padding:30px 10px; }
+
+  /* Scheda completa */
+  .foglio { position:fixed; inset:0; z-index:50; background:var(--carta); overflow-y:auto; transform:translateY(100%); transition:transform .28s ease; -webkit-overflow-scrolling:touch; }
+  .foglio.aperto { transform:none; }
+  .foglio-testa { position:sticky; top:0; z-index:2; background:linear-gradient(135deg, var(--verde), var(--verde2)); color:#fff; padding:calc(10px + env(safe-area-inset-top)) 14px 10px; display:flex; align-items:center; gap:10px; }
+  .chiudi { background:rgba(255,255,255,.14); border:none; color:#fff; border-radius:20px; width:36px; height:36px; font-size:20px; line-height:1; }
+  .foglio-testa span { font-size:13px; opacity:.8; }
+  .foglio-corpo { padding:18px 16px calc(40px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
+  .copertina-titolo { font-family:var(--serif); font-size:27px; font-weight:600; line-height:1.15; margin:4px 0 6px; color:var(--verde); }
+  .copertina-autore { font-size:17px; margin:0 0 12px; }
+  .griglia { display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:14px; }
+  .griglia dt { color:var(--grigio); }
+  .griglia dd { margin:0; }
+  .testo { font-size:14.5px; line-height:1.6; margin:0; }
+  ul.elenco { margin:0; padding-left:18px; font-size:14.5px; line-height:1.55; }
+  ul.elenco li { margin-bottom:6px; }
+  .trappola { background:var(--bordeaux-chiaro); border-left:4px solid var(--bordeaux); border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:14.5px; line-height:1.55; }
+  .aneddoto { border-left:4px solid var(--melanzana); background:#f1ecf2; border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:14.5px; line-height:1.55; font-style:italic; }
+  .speciale { border:1px dashed var(--ottone); background:#fffaf0; border-radius:14px; padding:12px 14px; margin-bottom:8px; font-size:14px; }
+  .speciale b { font-family:var(--serif); font-size:16px; }
+  table.prezzi { width:100%; border-collapse:collapse; font-size:14px; }
+  table.prezzi td { padding:7px 4px; border-bottom:1px solid var(--linea); vertical-align:top; }
+  table.prezzi td.n { text-align:right; font-weight:600; white-space:nowrap; }
+  .collegamenti { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .collegamenti a { text-decoration:none; background:var(--salvia); color:var(--verde); padding:9px 13px; border-radius:12px; font-size:14px; font-weight:600; }
+
+  /* Barra in basso */
+  nav.schede { position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(255,253,249,.94); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-top:1px solid var(--linea); display:flex; padding-bottom:env(safe-area-inset-bottom); }
+  nav.schede button { flex:1; height:var(--tab); background:none; border:none; color:var(--grigio); font-size:12px; font-weight:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  nav.schede svg { width:24px; height:24px; }
+  nav.schede button.attiva { color:var(--verde); }
+  nav.schede button.attiva svg { color:var(--ottone); }
 </style>
 </head>
 <body>
-<header><h1>Catalogo</h1><button id="esci" hidden>Esci</button></header>
+<header>
+  <div class="marchio">Catalogo<small id="sottotitolo">Prime edizioni da collezione</small></div>
+  <button class="esci" id="esci" hidden>Esci</button>
+</header>
+
 <main>
+  <!-- Login -->
   <section id="login" hidden>
-    <form id="form-login">
+    <form class="login" id="form-login">
+      <h2>Bentornato</h2>
+      <p class="sotto">Accedi per consultare il tuo catalogo.</p>
       <label>Email<input type="email" id="email" required autocomplete="username"></label>
       <label>Password<input type="password" id="password" required autocomplete="current-password"></label>
-      <button type="submit" class="primario">Entra</button>
+      <button type="submit" class="btn btn-verde">Entra</button>
       <p id="login-errore" class="errore"></p>
     </form>
   </section>
 
-  <section id="app" hidden>
-    <div class="azioni">
-      <button id="scansiona">▥ Barcode</button>
-      <button id="fotografa" class="foto">📷 Foto copertina</button>
+  <!-- Cerca -->
+  <section id="vista-cerca" hidden>
+    <div class="tessere">
+      <button class="tessera barcode" id="scansiona">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>
+        <div><b>Barcode</b><br><span>Libri con ISBN</span></div>
+      </button>
+      <button class="tessera foto" id="fotografa">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+        <div><b>Foto</b><br><span>Copertina o frontespizio</span></div>
+      </button>
     </div>
     <input type="file" id="file-foto" accept="image/*" capture="environment" hidden>
     <div id="lettore" hidden></div>
-    <button id="annulla" class="secondario" hidden>Annulla scansione</button>
+    <button id="annulla" class="btn btn-tenue" hidden>Annulla scansione</button>
     <img id="anteprima" hidden alt="">
-    <form id="form-cerca">
-      <input id="campo" placeholder="ISBN, oppure titolo e autore" autocomplete="off">
+    <form class="barra-ricerca" id="form-cerca">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="campo" placeholder="ISBN, titolo o autore" autocomplete="off">
       <button type="submit">Cerca</button>
     </form>
     <div id="stato"></div>
     <div id="risultati"></div>
   </section>
+
+  <!-- Catalogo -->
+  <section id="vista-catalogo" hidden>
+    <div class="strumenti">
+      <div class="barra-ricerca">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="filtro-testo" placeholder="Cerca nel catalogo" autocomplete="off">
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="filtri">
+        <select id="filtro-stato">
+          <option value="tutti">Tutte le schede</option>
+          <option value="verificata">Verificate</option>
+          <option value="verificata_fonte_singola">Fonte singola</option>
+          <option value="stima_ai">Stima AI</option>
+        </select>
+        <select id="ordine">
+          <option value="autore">Ordina per autore</option>
+          <option value="titolo">Ordina per titolo</option>
+          <option value="anno-su">Anno (dal più antico)</option>
+          <option value="anno-giu">Anno (dal più recente)</option>
+        </select>
+      </div>
+    </div>
+    <div class="conteggio" id="conteggio"></div>
+    <div id="elenco"></div>
+  </section>
 </main>
+
+<!-- Scheda completa -->
+<div class="foglio" id="foglio" aria-hidden="true">
+  <div class="foglio-testa"><button class="chiudi" id="chiudi-foglio" aria-label="Chiudi">‹</button><span>Scheda</span></div>
+  <div class="foglio-corpo" id="foglio-corpo"></div>
+</div>
+
+<nav class="schede" id="barra" hidden>
+  <button data-vista="cerca" class="attiva">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Cerca
+  </button>
+  <button data-vista="catalogo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a1 1 0 0 1 1-1h3v16H5a1 1 0 0 1-1-1zM8 4h4v16H8zM13.5 5.2l3.4-.9 3.6 13.5-3.4.9z"/></svg>Catalogo
+  </button>
+</nav>
 
 <script>
 const SUPABASE_URL = "https://wuolsexkbovgxxuqvkwx.supabase.co";
@@ -96,19 +238,36 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = (id) => document.getElementById(id);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const linkSicuro = (u) => /^https:\/\//i.test(u || "") ? esc(u) : "#";
-const ETICHETTE = { verificata:"Verificata", verificata_fonte_singola:"Verificata · fonte singola", stima_ai:"Stima AI" };
+const norm = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const ETICHETTE = { verificata:"Verificata", verificata_fonte_singola:"Fonte singola", stima_ai:"Stima AI" };
 const SOGLIA = 0.6;
-let lettore = null;
-let workerOcr = null;
-let ultimaRichiesta = null;
+
+let lettore = null, workerOcr = null, ultimaRichiesta = null;
+let catalogo = [], caricato = false;
+const filtro = { q:"", genere:"Tutti", stato:"tutti", ordine:"autore" };
+
+// ---------- Categorie ----------
+const MACRO = [
+  ["Poesia", /poesia|poesie/], ["Fantascienza", /fantascienza/], ["Fantasy", /fantasy|fantastico/],
+  ["Horror", /horror|gotico/], ["Giallo", /giallo|noir/], ["Fumetto", /fumetto/], ["Teatro", /teatro/],
+  ["Memorie", /memori|diario/], ["Racconti e prose", /racconti|prose|prosa/], ["Saggistica", /saggistica/],
+  ["Romanzi", /romanzo|narrativa/]
+];
+function macroGenere(g) { const s = norm(g); for (const [n, r] of MACRO) if (r.test(s)) return n; return "Altro"; }
+function prezzoBreve(m) {
+  const r = String(m || "").slice(0, 140).match(/(\d{1,3}(?:[.\s]\d{3})*(?:\s?[-–]\s?\d{1,3}(?:[.\s]\d{3})*)?)\s?€/);
+  return r ? r[1].replace(/\s/g, "") + " €" : null;
+}
 
 // ---------- Accesso ----------
 async function mostraSchermata() {
   const { data } = await sb.auth.getSession();
   const dentro = !!data.session;
   $("login").hidden = dentro;
-  $("app").hidden = !dentro;
+  $("barra").hidden = !dentro;
   $("esci").hidden = !dentro;
+  if (dentro) { vai(vistaAttiva); if (!caricato) caricaCatalogo(); }
+  else { $("vista-cerca").hidden = true; $("vista-catalogo").hidden = true; }
 }
 $("form-login").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -117,17 +276,163 @@ $("form-login").addEventListener("submit", async (e) => {
   if (error) $("login-errore").textContent = "Accesso non riuscito: controlla email e password.";
   mostraSchermata();
 });
-$("esci").addEventListener("click", async () => { await sb.auth.signOut(); mostraSchermata(); });
-sb.auth.onAuthStateChange(() => mostraSchermata());
+$("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; mostraSchermata(); });
 
-function pulisciSchermo() {
-  $("risultati").innerHTML = "";
-  $("anteprima").hidden = true;
-  $("stato").textContent = "";
+// ---------- Navigazione ----------
+let vistaAttiva = "cerca";
+function vai(v) {
+  vistaAttiva = v;
+  $("vista-cerca").hidden = v !== "cerca";
+  $("vista-catalogo").hidden = v !== "catalogo";
+  document.querySelectorAll("nav.schede button").forEach(b => b.classList.toggle("attiva", b.dataset.vista === v));
+  window.scrollTo(0, 0);
 }
+document.querySelectorAll("nav.schede button").forEach(b => b.addEventListener("click", () => {
+  if (v_chiusuraFoglio()) return;
+  if (b.dataset.vista === "cerca" && vistaAttiva === "cerca") return;
+  vai(b.dataset.vista);
+}));
+function v_chiusuraFoglio() { if ($("foglio").classList.contains("aperto")) { history.back(); return true; } return false; }
+
+// ---------- Catalogo ----------
+async function caricaCatalogo() {
+  $("conteggio").textContent = "Carico il catalogo…";
+  const { data, error } = await sb.from("edizioni")
+    .select("id, autore, titolo, editore, anno, collana, genere, stato_verifica, mercato")
+    .order("autore");
+  if (error) { $("conteggio").innerHTML = '<span class="errore">Non riesco a caricare il catalogo.</span>'; return; }
+  catalogo = data.map(x => ({ ...x, macro: macroGenere(x.genere), prezzo: prezzoBreve(x.mercato),
+    chiave: norm([x.autore, x.titolo, x.editore, x.collana, x.genere].join(" ")) }));
+  caricato = true;
+  $("sottotitolo").textContent = catalogo.length + " edizioni in catalogo";
+  disegnaCatalogo();
+}
+
+function disegnaChips() {
+  const conti = {};
+  catalogo.forEach(x => conti[x.macro] = (conti[x.macro] || 0) + 1);
+  const ordine = Object.keys(conti).sort((a, b) => conti[b] - conti[a]);
+  const voci = [["Tutti", catalogo.length], ...ordine.map(k => [k, conti[k]])];
+  $("chips").innerHTML = voci.map(([n, c]) =>
+    `<button class="chip ${filtro.genere === n ? "attivo" : ""}" data-genere="${esc(n)}">${esc(n)}<i>${c}</i></button>`).join("");
+}
+$("chips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-genere]"); if (!b) return;
+  filtro.genere = b.dataset.genere; disegnaCatalogo();
+});
+$("filtro-testo").addEventListener("input", (e) => { filtro.q = norm(e.target.value.trim()); disegnaCatalogo(); });
+$("filtro-stato").addEventListener("change", (e) => { filtro.stato = e.target.value; disegnaCatalogo(); });
+$("ordine").addEventListener("change", (e) => { filtro.ordine = e.target.value; disegnaCatalogo(); });
+
+function disegnaCatalogo() {
+  disegnaChips();
+  const parole = filtro.q ? filtro.q.split(/\s+/) : [];
+  let righe = catalogo.filter(x =>
+    (filtro.genere === "Tutti" || x.macro === filtro.genere) &&
+    (filtro.stato === "tutti" || x.stato_verifica === filtro.stato) &&
+    parole.every(p => x.chiave.includes(p)));
+  const cmp = {
+    "autore": (a, b) => a.autore.localeCompare(b.autore, "it") || (a.anno || 0) - (b.anno || 0),
+    "titolo": (a, b) => a.titolo.localeCompare(b.titolo, "it"),
+    "anno-su": (a, b) => (a.anno || 9999) - (b.anno || 9999),
+    "anno-giu": (a, b) => (b.anno || 0) - (a.anno || 0)
+  }[filtro.ordine];
+  righe.sort(cmp);
+  $("conteggio").textContent = righe.length === catalogo.length ? `${righe.length} edizioni` : `${righe.length} di ${catalogo.length} edizioni`;
+  $("elenco").innerHTML = righe.length ? righe.map(cartolina).join("") : `<div class="vuoto">Nessun libro corrisponde ai filtri.</div>`;
+}
+function cartolina(x) {
+  const meta = [x.editore, x.anno].filter(Boolean).map(esc).join(" · ");
+  return `<button class="libro s-${esc(x.stato_verifica)}" data-id="${esc(x.id)}">
+    <div class="nastro"></div>
+    <div class="libro-corpo">
+      <div class="libro-titolo">${esc(x.titolo)}</div>
+      <div class="libro-autore">${esc(x.autore)}</div>
+      <div class="libro-meta">${meta}</div>
+      <div class="libro-piede">
+        ${x.prezzo ? `<span class="pill prezzo">${esc(x.prezzo)}</span>` : ""}
+        <span class="pill">${esc(x.macro)}</span>
+        <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
+      </div>
+    </div>
+  </button>`;
+}
+$("elenco").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) apriScheda(b.dataset.id); });
+
+// ---------- Scheda completa ----------
+function apriScheda(id) {
+  history.pushState({ scheda: id }, "");
+  $("foglio-corpo").innerHTML = `<div class="vuoto">Carico la scheda…</div>`;
+  $("foglio").classList.add("aperto");
+  $("foglio").scrollTop = 0;
+  caricaScheda(id);
+}
+window.addEventListener("popstate", () => $("foglio").classList.remove("aperto"));
+$("chiudi-foglio").addEventListener("click", () => history.back());
+
+async function caricaScheda(id) {
+  const { data: x, error } = await sb.from("edizioni")
+    .select("*, edizioni_speciali(*), osservazioni_prezzo(*)").eq("id", id).single();
+  if (error || !x) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">Non riesco ad aprire la scheda.</div>`; return; }
+  $("foglio-corpo").innerHTML = schedaCompleta(x);
+}
+
+function sezione(titolo, contenuto) { return contenuto ? `<h3 class="sezione">${esc(titolo)}</h3>${contenuto}` : ""; }
+function elenco(arr) { return (arr && arr.length) ? `<div class="riquadro"><ul class="elenco">${arr.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""; }
+
+function schedaCompleta(x) {
+  const prezzo = prezzoBreve(x.mercato);
+  const id = [["Editore", x.editore], ["Anno", x.anno], ["Collana", x.collana], ["Genere", x.genere],
+    ["Traduttore", x.traduttore], ["ISBN", x.isbn], ["Prima edizione", x.prima_edizione === false ? "No" : "Sì"]]
+    .filter(([, v]) => v !== null && v !== undefined && v !== "")
+    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+
+  const speciali = (x.edizioni_speciali || []).sort((a, b) => a.ordine - b.ordine).map(s => `
+    <div class="speciale"><b>${esc(s.tipo || "Edizione speciale")}</b>
+      ${s.tiratura ? `<div class="t-meta">${esc(s.tiratura)}</div>` : ""}
+      ${s.descrizione ? `<p class="testo">${esc(s.descrizione)}</p>` : ""}
+      ${(s.caratteristiche || []).length ? `<ul class="elenco" style="margin-top:6px">${s.caratteristiche.map(c => `<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+      ${s.mercato ? `<p class="testo" style="margin-top:6px"><b style="font-family:var(--sans);font-size:14px">Mercato:</b> ${esc(s.mercato)}</p>` : ""}
+      ${s.fonte ? `<div class="t-meta" style="margin-top:6px">Fonte: ${esc(s.fonte)}</div>` : ""}
+    </div>`).join("");
+
+  const oss = (x.osservazioni_prezzo || []).sort((a, b) => String(b.data_rilevazione || "").localeCompare(String(a.data_rilevazione || "")));
+  const tabellaPrezzi = oss.length ? `<div class="riquadro"><table class="prezzi">${oss.map(o =>
+    `<tr><td>${esc(o.fonte)}<div class="t-meta" style="margin:2px 0 0">${esc(o.data_rilevazione || "")}${o.con_autografo ? " · con autografo" : ""}</div></td><td class="n">${esc(Number(o.prezzo).toLocaleString("it-IT"))} €</td></tr>`).join("")}</table></div>` : "";
+
+  const ricercaFoto = (x.foto_riferimento || "").replace(/^Ricerca immagini per:\s*/i, "") || `${x.autore} ${x.titolo} ${x.editore || ""} ${x.anno || ""}`;
+  const collegamenti = `<div class="collegamenti">
+      <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ricercaFoto)}" target="_blank" rel="noopener">Foto di riferimento</a>
+      ${x.codice_sbn ? `<a href="https://opac.sbn.it/risultati-ricerca-avanzata/-/opac-adv/detail/${encodeURIComponent(x.codice_sbn)}" target="_blank" rel="noopener">OPAC SBN</a>` : ""}
+    </div>`;
+
+  return `
+    <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
+    <span class="pill">${esc(macroGenere(x.genere))}</span>
+    ${prezzo ? `<span class="pill prezzo">${esc(prezzo)}</span>` : ""}
+    <h1 class="copertina-titolo">${esc(x.titolo)}</h1>
+    <p class="copertina-autore">${esc(x.autore)}</p>
+    <div class="riquadro"><dl class="griglia">${id}</dl></div>
+    ${collegamenti}
+    ${sezione("Prima edizione", (x.descrizione || x.prima_edizione_nota) ? `<div class="riquadro">${x.prima_edizione_nota ? `<p class="avviso" style="margin-top:0">${esc(x.prima_edizione_nota)}</p>` : ""}<p class="testo">${esc(x.descrizione || "")}</p></div>` : "")}
+    ${sezione("Prima tiratura", elenco(x.prima_tiratura))}
+    ${sezione("Trappole da evitare", (x.trappole || []).map(t => `<div class="trappola">${esc(t)}</div>`).join(""))}
+    ${sezione("Edizioni speciali", speciali)}
+    ${sezione("Mercato", x.mercato ? `<div class="riquadro oro"><p class="testo">${esc(x.mercato)}</p></div>` : "")}
+    ${sezione("Rilevazioni di prezzo", tabellaPrezzi)}
+    ${sezione("Consigli d'acquisto", x.acquisto ? `<div class="riquadro"><p class="testo">${esc(x.acquisto)}</p></div>` : "")}
+    ${sezione("Aneddoti e contesto", (x.aneddoti || []).map(t => `<div class="aneddoto">${esc(t)}</div>`).join(""))}
+    ${sezione("Ristampe", elenco(x.ristampe))}
+    ${sezione("Varianti", elenco(x.varianti))}
+    ${sezione("Fonti", elenco(x.fonti))}
+    ${sezione("Affidabilità", `<div class="riquadro"><p class="testo">${esc(x.affidabilita)}</p>${x.aggiornamento ? `<div class="t-meta" style="margin-top:8px">Aggiornata il ${esc(new Date(x.aggiornamento).toLocaleDateString("it-IT"))}</div>` : ""}</div>`)}
+  `;
+}
+
+// ---------- Cerca: barcode ----------
+function pulisciSchermo() { $("risultati").innerHTML = ""; $("anteprima").hidden = true; $("stato").textContent = ""; }
 function bloccaPulsanti(si) { $("scansiona").disabled = si; $("fotografa").disabled = si; }
 
-// ---------- Barcode ----------
 $("scansiona").addEventListener("click", async () => {
   pulisciSchermo();
   $("lettore").hidden = false; $("annulla").hidden = false;
@@ -164,19 +469,30 @@ async function fermaScansione() {
 }
 $("annulla").addEventListener("click", () => { fermaScansione(); $("stato").textContent = ""; });
 
-// ---------- Foto copertina (lettura sul telefono con Tesseract) ----------
+// ---------- Cerca: foto (Tesseract sul telefono) ----------
 async function ottieniWorker() {
   if (!workerOcr) {
     $("stato").textContent = "Preparo il lettore di testo (solo la prima volta, qualche secondo)…";
     workerOcr = await Tesseract.createWorker("ita+eng", 1, {
-      logger: (m) => {
-        if (m.status === "recognizing text") $("stato").textContent = "Leggo la copertina… " + Math.round(m.progress * 100) + "%";
-      }
+      logger: (m) => { if (m.status === "recognizing text") $("stato").textContent = "Leggo la copertina… " + Math.round(m.progress * 100) + "%"; }
     });
+    await workerOcr.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT });
   }
   return workerOcr;
 }
-
+function righeDaOcr(data) {
+  const righe = [];
+  for (const b of (data.blocks || [])) for (const p of (b.paragraphs || [])) for (const l of (p.lines || [])) {
+    const parole = (l.words || []).filter(w => w.confidence >= 55 && /\p{L}{2,}/u.test(w.text));
+    if (!parole.length) continue;
+    const testo = parole.map(w => w.text.replace(/[^\p{L}\p{N}'’-]/gu, "")).filter(Boolean).join(" ");
+    if ((testo.match(/\p{L}/gu) || []).length < 3) continue;
+    const altezza = parole.reduce((s, w) => s + (w.bbox.y1 - w.bbox.y0), 0) / parole.length;
+    righe.push({ testo, altezza });
+  }
+  righe.sort((a, b) => b.altezza - a.altezza);
+  return righe.slice(0, 5).map(r => r.testo).join("\n") || (data.text || "");
+}
 $("fotografa").addEventListener("click", () => { $("file-foto").value = ""; $("file-foto").click(); });
 $("file-foto").addEventListener("change", async () => {
   const file = $("file-foto").files && $("file-foto").files[0];
@@ -185,20 +501,18 @@ $("file-foto").addEventListener("change", async () => {
   bloccaPulsanti(true);
   try {
     $("stato").textContent = "Preparo la foto…";
-    const tela = await preparaFoto(file, 1400);
+    const tela = await preparaFoto(file, 1800);
     $("anteprima").src = tela.toDataURL("image/jpeg", 0.8);
     $("anteprima").hidden = false;
     const w = await ottieniWorker();
-    const { data } = await w.recognize(tela);
-    await cerca({ testo_ocr: (data && data.text) || "" }, "Cerco…");
+    const { data } = await w.recognize(tela, {}, { text: true, blocks: true });
+    await cerca({ testo_ocr: righeDaOcr(data) }, "Cerco…");
   } catch (_) {
     $("stato").innerHTML = '<span class="errore">Non riesco a leggere la foto. Riprova con più luce.</span>';
   } finally {
     bloccaPulsanti(false);
   }
 });
-
-// Ridimensiona e converte in bianco e nero ad alto contrasto: aiuta molto la lettura
 function preparaFoto(file, lato) {
   return new Promise((ok, ko) => {
     const img = new Image();
@@ -209,11 +523,10 @@ function preparaFoto(file, lato) {
       c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
       const ctx = c.getContext("2d", { willReadFrequently: true });
       ctx.drawImage(img, 0, 0, c.width, c.height);
-      const d = ctx.getImageData(0, 0, c.width, c.height);
-      const p = d.data;
+      const d = ctx.getImageData(0, 0, c.width, c.height), p = d.data;
       for (let i = 0; i < p.length; i += 4) {
         let g = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2];
-        g = Math.max(0, Math.min(255, (g - 128) * 1.4 + 128));
+        g = Math.max(0, Math.min(255, (g - 128) * 1.2 + 128));
         p[i] = p[i + 1] = p[i + 2] = g;
       }
       ctx.putImageData(d, 0, 0);
@@ -225,7 +538,27 @@ function preparaFoto(file, lato) {
   });
 }
 
-// ---------- Ricerca manuale ----------
+// ---------- Google Books (dal telefono) ----------
+async function googleBooksDalTelefono(q) {
+  const u = new URL("https://www.googleapis.com/books/v1/volumes");
+  u.searchParams.set("q", q); u.searchParams.set("maxResults", "8"); u.searchParams.set("printType", "books");
+  const r = await fetch(u);
+  if (!r.ok) throw new Error("Google Books ha risposto " + r.status);
+  const d = await r.json();
+  return {
+    avviso: "Google Books mescola edizioni e ristampe: utile per titolo e copertina, non per stabilire la prima edizione.",
+    risultati: (d.items || []).map((it) => {
+      const v = it.volumeInfo || {}, ids = v.industryIdentifiers || [];
+      const img = (v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail)) || null;
+      const i13 = ids.find(x => x.type === "ISBN_13"), i10 = ids.find(x => x.type === "ISBN_10");
+      return { titolo: [v.title, v.subtitle].filter(Boolean).join(": "), autori: v.authors || [], editore: v.publisher || null,
+        data: v.publishedDate || null, isbn: (i13 && i13.identifier) || (i10 && i10.identifier) || null,
+        copertina: img ? String(img).replace(/^http:/, "https:") : null, link: v.infoLink || null };
+    })
+  };
+}
+
+// ---------- Cerca: testo e chiamata al server ----------
 $("form-cerca").addEventListener("submit", (e) => {
   e.preventDefault();
   const v = $("campo").value.trim();
@@ -249,97 +582,76 @@ async function cerca(corpo, messaggio) {
     $("stato").innerHTML = '<span class="errore">' + esc(dettaglio) + '</span>';
     return;
   }
+  if (data.google_books_da_telefono && data.chiave_google_books) {
+    try { data.google_books = await googleBooksDalTelefono(data.chiave_google_books); }
+    catch (e) { data.google_books = { errore: "Google Books non raggiungibile: " + e.message }; }
+  }
   $("stato").textContent = "";
-  mostra(data);
+  mostraRisultati(data);
 }
 
-// ---------- Risultati ----------
-function schedaCatalogo(x, evidenza) {
-  const trappole = (x.trappole || []).length
-    ? `<details class="trappole"><summary>⚠️ Trappole (${x.trappole.length})</summary><ul>${x.trappole.map(t => `<li>${esc(t)}</li>`).join("")}</ul></details>` : "";
-  const dati = [x.editore, x.anno, x.collana].filter(Boolean).map(esc).join(" · ");
-  return `<div class="scheda ${evidenza ? "evidenza" : ""}">
-    <span class="badge b-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || x.stato_verifica)}</span>
-    <p class="titolo">${esc(x.titolo)}</p>
-    <p class="autore">${esc(x.autore)}</p>
-    <p class="dati">${dati}</p>
-    ${x.mercato ? `<p class="mercato"><strong>Mercato:</strong> ${esc(x.mercato)}</p>` : ""}
-    ${trappole}
-  </div>`;
-}
-function schedaSbn(r, etichetta, evidenza) {
-  return `<div class="scheda ${evidenza ? "evidenza" : ""}">
-    <p class="dati">${esc(etichetta)}</p>
-    <p class="titolo">${esc(r.titolo)}</p>
-    <p class="autore">${esc(r.autore || "")}</p>
-    <p class="dati">${esc(r.pubblicazione || "")}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</p>
+function schedaSbn(r, etichetta, oro) {
+  return `<div class="riquadro ${oro ? "oro" : ""}">
+    <p class="etichetta">${esc(etichetta)}</p>
+    <p class="t-serif">${esc(r.titolo)}</p>
+    <p class="t-autore">${esc(r.autore || "")}</p>
+    <p class="t-meta">${esc(r.pubblicazione || "")}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</p>
     <a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">Apri in OPAC SBN</a>
   </div>`;
 }
+function cartolineCatalogo(lista) {
+  return lista.map(x => cartolina({ ...x, macro: macroGenere(x.genere), prezzo: prezzoBreve(x.mercato) })).join("");
+}
 
-function mostra(d) {
+function mostraRisultati(d) {
   let h = "";
-
   if (d.testo_letto !== null && d.testo_letto !== undefined) {
-    h += `<div class="scheda letto"><p class="dati">Testo letto dalla foto (correggilo se serve):</p>
+    h += `<div class="riquadro"><p class="etichetta">Testo letto dalla foto · correggilo se serve</p>
       <textarea id="testo-letto" rows="3">${esc(d.chiave_usata || d.testo_letto)}</textarea>
-      <button class="secondario" id="ricerca-letto">Cerca con questo testo</button></div>`;
+      <button class="btn btn-tenue" id="ricerca-letto">Cerca con questo testo</button></div>`;
   }
   if (d.errore) h += `<p class="errore">${esc(d.errore)}</p>`;
 
   const forti = (d.catalogo || []).filter(x => x.punteggio >= SOGLIA);
   const deboli = (d.catalogo || []).filter(x => x.punteggio < SOGLIA);
-
-  if (forti.length) h += `<h2>Nel tuo catalogo</h2>` + forti.map(x => schedaCatalogo(x, false)).join("");
-  if ((d.stesso_titolo_nel_catalogo || []).length) {
-    h += `<h2>Questo titolo è nel tuo catalogo</h2>` + d.stesso_titolo_nel_catalogo.map(x => schedaCatalogo(x, true)).join("");
-  }
+  if (forti.length) h += `<h3 class="sezione">Nel tuo catalogo</h3>` + cartolineCatalogo(forti);
+  if ((d.stesso_titolo_nel_catalogo || []).length) h += `<h3 class="sezione">Questo titolo è nel tuo catalogo</h3>` + cartolineCatalogo(d.stesso_titolo_nel_catalogo);
 
   const s = d.sbn;
-  if (s && s.errore) {
-    h += `<h2>OPAC SBN</h2><p class="errore">${esc(s.errore)}</p>`;
-  } else if (s) {
-    h += `<h2>OPAC SBN</h2>`;
+  if (s && s.errore) h += `<h3 class="sezione">OPAC SBN</h3><p class="errore">${esc(s.errore)}</p>`;
+  else if (s) {
+    h += `<h3 class="sezione">OPAC SBN</h3>`;
     if (s.edizione_in_mano) h += schedaSbn(s.edizione_in_mano, "Edizione che hai in mano", false);
-    if (s.candidata_prima_edizione) {
-      h += schedaSbn(s.candidata_prima_edizione, "Candidata prima edizione", true);
-      h += `<p class="avviso">${esc(s.avviso)}</p>`;
-    }
+    if (s.candidata_prima_edizione) { h += schedaSbn(s.candidata_prima_edizione, "Candidata prima edizione", true); h += `<p class="avviso">${esc(s.avviso)}</p>`; }
     if ((s.risultati || []).length) {
-      const nota = s.elenco_completo ? "" : ` — mostrate ${s.risultati.length} su ${s.totale_in_sbn}`;
+      const nota = s.elenco_completo ? "" : ` · mostrate ${s.risultati.length} su ${s.totale_in_sbn}`;
       h += `<details><summary>Tutte le edizioni in SBN (${esc(s.totale_in_sbn)})${esc(nota)}</summary>` +
-        s.risultati.map(r => `<div class="riga"><div><strong>${esc(r.anno || "s.d.")}</strong> — ${esc(r.titolo)}<br>${esc(r.pubblicazione || "")} · <a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">SBN</a></div></div>`).join("") +
-        `</details>`;
+        s.risultati.map(r => `<div class="riga"><div><b>${esc(r.anno || "s.d.")}</b> — ${esc(r.titolo)}<br><span class="t-meta">${esc(r.pubblicazione || "")}</span> · <a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">SBN</a></div></div>`).join("") + `</details>`;
     }
     if (!s.edizione_in_mano && !(s.risultati || []).length) h += `<p class="vuoto">Nessun risultato in SBN.</p>`;
   }
 
   const g = d.google_books;
-  if (g && g.errore) {
-    h += `<h2>Google Books</h2><p class="errore">${esc(g.errore)}</p>`;
-  } else if (g && (g.risultati || []).length) {
-    h += `<h2>Google Books</h2><p class="avviso">${esc(g.avviso)}</p>` +
-      g.risultati.map(r => `<div class="riga">
-        ${r.copertina ? `<img src="${linkSicuro(r.copertina)}" alt="">` : ""}
-        <div><strong>${esc(r.titolo)}</strong><br>${esc((r.autori || []).join(", "))}<br>
-        <span class="dati">${esc([r.editore, r.data].filter(Boolean).join(" · "))}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</span>
+  if (g && g.errore) h += `<h3 class="sezione">Google Books</h3><p class="errore">${esc(g.errore)}</p>`;
+  else if (g && (g.risultati || []).length) {
+    h += `<h3 class="sezione">Google Books</h3><p class="avviso">${esc(g.avviso)}</p>` +
+      g.risultati.map(r => `<div class="riga">${r.copertina ? `<img src="${linkSicuro(r.copertina)}" alt="">` : ""}
+        <div><b>${esc(r.titolo)}</b><br>${esc((r.autori || []).join(", "))}<br>
+        <span class="t-meta">${esc([r.editore, r.data].filter(Boolean).join(" · "))}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</span>
         ${r.link ? `<br><a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">Apri</a>` : ""}</div></div>`).join("");
   }
 
-  if (!forti.length && deboli.length) h += `<h2>Forse cercavi (catalogo)</h2>` + deboli.map(x => schedaCatalogo(x, false)).join("");
-  if (forti.length && !s) h += `<button class="secondario" id="anche-fuori">Cerca anche in SBN e Google Books</button>`;
+  if (!forti.length && deboli.length) h += `<h3 class="sezione">Forse cercavi</h3>` + cartolineCatalogo(deboli);
+  if (forti.length && !s) h += `<button class="btn btn-tenue" id="anche-fuori">Cerca anche in SBN e Google Books</button>`;
   if (!h) h = `<p class="vuoto">Nessun risultato.</p>`;
 
   $("risultati").innerHTML = h;
-
   const b = $("anche-fuori");
   if (b) b.addEventListener("click", () => cerca({ ...ultimaRichiesta, forza_sbn: true }, "Cerco anche fuori dal catalogo…"));
   const r = $("ricerca-letto");
-  if (r) r.addEventListener("click", () => {
-    const t = $("testo-letto").value.trim();
-    if (t) { pulisciSchermo(); cerca({ testo: t }, "Cerco…"); }
-  });
+  if (r) r.addEventListener("click", () => { const t = $("testo-letto").value.trim(); if (t) { pulisciSchermo(); cerca({ testo: t }, "Cerco…"); } });
 }
+$("risultati").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) apriScheda(b.dataset.id); });
 
 mostraSchermata();
 </script>
