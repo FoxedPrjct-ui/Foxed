@@ -27,7 +27,11 @@
     --tab:64px;
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html, body { margin:0; background:var(--carta); color:var(--inchiostro); font-family:var(--sans); font-size:15px; }
+  html, body { margin:0; color:var(--inchiostro); font-family:var(--sans); font-size:15px; }
+  /* Sull'iPhone, con l'app sulla schermata Home, sotto la barra resta una fascia fuori dalla pagina:
+     prende il colore di html, quindi lo si fa uguale alla barra; il fondo crema sta su body */
+  html { background:#fdfaf4; }
+  body { background:var(--carta); min-height:100vh; min-height:100dvh; }
   button { font-family:inherit; cursor:pointer; }
   [hidden] { display:none !important; }
   a { color:var(--verde2); }
