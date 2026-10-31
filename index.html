@@ -3,24 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#173226">
+<meta name="theme-color" content="#120d0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Catalogo">
-<title>Catalogo</title>
+<meta name="apple-mobile-web-app-title" content="Linceo">
+<title>Linceo</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
   :root {
-    --verde:#173226; --verde2:#24503b; --ottone:#b48a3a; --ottone-chiaro:#f4e9d0; --ottone-testo:#6b5520;
-    --carta:#f5f1e8; --bianco:#fffdf9; --inchiostro:#1d1d1b; --grigio:#625e55; --linea:#e6dfd0;
-    --bordeaux:#8a2f2f; --bordeaux-chiaro:#f7e6e3; --salvia:#e3e9df; --melanzana:#4a3550;
-    --ombra:0 1px 2px rgba(23,50,38,.06), 0 4px 14px rgba(23,50,38,.07);
-    --serif:"Fraunces", Georgia, serif; --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --verde:#1c1410; --verde2:#3b2b1f; --ottone:#a9845a; --ottone-chiaro:#efe3cf; --ottone-testo:#6b4c2c;
+    --carta:#ece5d8; --bianco:#faf6ef; --inchiostro:#1c1612; --grigio:#625a50; --linea:#ddd2c0;
+    --bordeaux:#8a2f2f; --bordeaux-chiaro:#f7e6e3; --salvia:#e5dac7; --melanzana:#4a3550;
+    --ombra:0 1px 2px rgba(28,20,16,.07), 0 4px 14px rgba(28,20,16,.08);
+    --serif:"Cormorant Garamond", Georgia, serif; --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --tab:64px;
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -29,16 +32,19 @@
   [hidden] { display:none !important; }
   a { color:var(--verde2); }
 
-  header { position:sticky; top:0; z-index:20; background:linear-gradient(135deg, var(--verde), var(--verde2)); color:#fff;
-    padding:calc(12px + env(safe-area-inset-top)) 18px 14px; display:flex; align-items:flex-end; justify-content:space-between; }
-  .marchio { font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:.3px; line-height:1; }
-  .marchio small { display:block; font-family:var(--sans); font-size:12px; font-weight:400; opacity:.8; margin-top:4px; letter-spacing:.4px; }
+  header { position:sticky; top:0; z-index:20; background:linear-gradient(135deg, #0f0b08, var(--verde2)); color:#f3ece0;
+    padding:calc(12px + env(safe-area-inset-top)) 18px 12px; display:flex; align-items:center; justify-content:space-between; }
+  .marchio-box { display:flex; align-items:center; gap:12px; }
+  .emblema { width:46px; height:46px; border-radius:11px; object-fit:cover; box-shadow:0 0 0 1px rgba(255,255,255,.14); flex-shrink:0; }
+  .marchio { font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:.28em; text-transform:uppercase; line-height:1; }
+  .marchio small { display:block; font-family:var(--sans); font-size:12px; font-weight:400; opacity:.8; margin-top:5px; letter-spacing:.4px; text-transform:none; }
+  .login-logo { display:block; width:100%; border-radius:14px; margin:0 0 18px; }
   .esci { background:rgba(255,255,255,.12); color:#fff; border:none; border-radius:20px; padding:7px 12px; font-size:13px; }
 
   main { padding:16px 16px calc(var(--tab) + 24px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
 
   .login { max-width:380px; margin:12vh auto 0; background:var(--bianco); border-radius:20px; padding:26px 22px; box-shadow:var(--ombra); }
-  .login h2 { font-family:var(--serif); font-weight:600; margin:0 0 4px; font-size:24px; color:var(--verde); }
+  .login h2 { font-family:var(--serif); font-weight:700; margin:0 0 4px; font-size:28px; color:var(--verde); }
   .login p.sotto { color:var(--grigio); margin:0 0 18px; font-size:14px; }
   label { display:block; font-size:13px; color:var(--grigio); margin-bottom:12px; }
   input, textarea, select { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--linea); border-radius:12px; background:#fff; margin-top:5px; font-family:inherit; color:var(--inchiostro); outline:none; }
@@ -52,7 +58,7 @@
   .riga-btn { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .riga-btn .btn { flex:1 1 140px; }
   .errore { color:var(--bordeaux); font-size:14px; }
-  .h2 { font-family:var(--serif); font-size:22px; font-weight:600; color:var(--verde); margin:4px 2px 4px; }
+  .h2 { font-family:var(--serif); font-size:26px; font-weight:700; color:var(--verde); margin:4px 2px 4px; }
   .intro { color:var(--grigio); font-size:14px; margin:0 2px 14px; line-height:1.5; }
 
   /* Cerca */
@@ -62,7 +68,7 @@
   .tessera b { font-size:16px; font-weight:600; }
   .tessera span { font-size:12px; opacity:.85; font-weight:400; }
   .tessera.barcode { background:linear-gradient(140deg, var(--verde), var(--verde2)); }
-  .tessera.foto { background:linear-gradient(140deg, #8f6a24, var(--ottone)); }
+  .tessera.foto { background:linear-gradient(140deg, #5e4329, var(--ottone)); }
   .tessera:disabled { opacity:.5; }
   .barra-ricerca { display:flex; gap:8px; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:4px 4px 4px 12px; box-shadow:var(--ombra); }
   .barra-ricerca svg { width:18px; height:18px; color:var(--grigio); flex-shrink:0; }
@@ -77,7 +83,7 @@
   .riquadro.oro { background:#fffaf0; border:1px solid var(--ottone-chiaro); }
   .riquadro.salvato { background:var(--salvia); }
   .etichetta { font-size:12px; color:var(--grigio); text-transform:uppercase; letter-spacing:.8px; margin:0 0 6px; }
-  .t-serif { font-family:var(--serif); font-size:19px; font-weight:600; margin:0 0 2px; line-height:1.25; }
+  .t-serif { font-family:var(--serif); font-size:21px; font-weight:700; margin:0 0 2px; line-height:1.25; }
   .t-autore { margin:0 0 6px; }
   .t-meta { color:var(--grigio); font-size:14px; margin:0 0 6px; }
   .avviso { font-size:13px; color:var(--ottone-testo); background:var(--ottone-chiaro); padding:9px 12px; border-radius:10px; margin:8px 0; line-height:1.45; }
@@ -88,14 +94,14 @@
 
   /* Schede SBN cliccabili */
   .ed { display:flex; width:100%; text-align:left; border:none; background:var(--bianco); border-radius:14px; padding:12px 14px; margin-bottom:8px; box-shadow:var(--ombra); color:inherit; gap:12px; align-items:flex-start; font-size:14px; }
-  .ed .anno { font-family:var(--serif); font-weight:600; font-size:18px; color:var(--verde); min-width:46px; }
+  .ed .anno { font-family:var(--serif); font-weight:700; font-size:20px; color:var(--verde); min-width:46px; }
   .ed .corpo { flex:1; min-width:0; }
   .ed .tit { font-weight:600; margin-bottom:3px; line-height:1.35; }
   .ed .pub { color:var(--grigio); line-height:1.35; }
   .ed.oro { background:#fffaf0; border:1px solid var(--ottone-chiaro); }
 
   /* Catalogo */
-  .strumenti { position:sticky; top:calc(64px + env(safe-area-inset-top)); z-index:10; background:var(--carta); padding:4px 0 8px; }
+  .strumenti { position:sticky; top:calc(70px + env(safe-area-inset-top)); z-index:10; background:var(--carta); padding:4px 0 8px; }
   .chips { display:flex; gap:8px; overflow-x:auto; padding:10px 2px 4px; scrollbar-width:none; }
   .chips::-webkit-scrollbar { display:none; }
   .chip { flex-shrink:0; border:1px solid var(--linea); background:var(--bianco); color:var(--inchiostro); border-radius:20px; padding:8px 12px; font-size:13px; font-weight:500; min-height:36px; }
@@ -108,17 +114,17 @@
 
   .libro { display:flex; width:100%; text-align:left; border:none; background:var(--bianco); border-radius:16px; padding:0; margin-bottom:10px; box-shadow:var(--ombra); overflow:hidden; color:inherit; }
   .nastro { width:6px; flex-shrink:0; background:var(--verde); }
-  .s-verificata_fonte_singola .nastro { background:#5c8a6c; }
+  .s-verificata_fonte_singola .nastro { background:#8a6d50; }
   .s-stima_ai .nastro { background:#a9a397; }
   .libro-corpo { flex:1; padding:13px 14px 12px; min-width:0; }
-  .libro-titolo { font-family:var(--serif); font-size:17px; font-weight:600; line-height:1.25; margin-bottom:3px; }
+  .libro-titolo { font-family:var(--serif); font-size:19.5px; font-weight:700; line-height:1.25; margin-bottom:3px; }
   .libro-autore { font-size:14px; margin-bottom:4px; }
   .libro-meta { font-size:13px; color:var(--grigio); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .libro-piede { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; align-items:center; }
   .pill { display:inline-block; font-size:11.5px; padding:3px 9px; border-radius:20px; background:var(--salvia); color:var(--verde); font-weight:500; }
   .pill.prezzo { background:var(--ottone-chiaro); color:var(--ottone-testo); font-weight:600; }
   .pill.stato-verificata { background:var(--verde); color:#fff; }
-  .pill.stato-verificata_fonte_singola { background:#4f7d5f; color:#fff; }
+  .pill.stato-verificata_fonte_singola { background:#6d5641; color:#fff; }
   .pill.stato-stima_ai { background:#77736a; color:#fff; }
   .pill.edit16 { background:var(--melanzana); color:#fff; }
 
@@ -138,7 +144,7 @@
   .st-approvata { background:var(--verde); color:#fff; }
   .st-scartata { background:#ecebe7; color:#55524b; }
   .esito { border-radius:12px; padding:12px; margin:8px 0; font-size:14px; line-height:1.5; }
-  .esito-merita { background:#eaf2ec; border-left:4px solid var(--verde); }
+  .esito-merita { background:#efe6d6; border-left:4px solid var(--verde); }
   .esito-non_merita { background:#ecebe7; border-left:4px solid #77736a; }
   .esito-senza_prezzo { background:var(--ottone-chiaro); border-left:4px solid var(--ottone); }
   .toast { position:fixed; left:16px; right:16px; bottom:calc(var(--tab) + 16px + env(safe-area-inset-bottom)); z-index:40; background:var(--verde); color:#fff; border-radius:14px; padding:12px 14px; display:flex; gap:10px; align-items:center; box-shadow:0 6px 24px rgba(0,0,0,.25); max-width:688px; margin:0 auto; font-size:14px; }
@@ -152,7 +158,7 @@
   .chiudi { background:rgba(255,255,255,.14); border:none; color:#fff; border-radius:22px; width:44px; height:44px; font-size:22px; line-height:1; }
   .foglio-testa span { font-size:14px; opacity:.85; }
   .foglio-corpo { padding:18px 16px calc(40px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
-  .copertina-titolo { font-family:var(--serif); font-size:25px; font-weight:600; line-height:1.18; margin:8px 0 6px; color:var(--verde); }
+  .copertina-titolo { font-family:var(--serif); font-size:28px; font-weight:700; line-height:1.18; margin:8px 0 6px; color:var(--verde); }
   .copertina-autore { font-size:17px; margin:0 0 12px; }
   .griglia { display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:14px; }
   .griglia dt { color:var(--grigio); }
@@ -163,7 +169,7 @@
   .trappola { background:var(--bordeaux-chiaro); border-left:4px solid var(--bordeaux); border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:14.5px; line-height:1.55; }
   .aneddoto { border-left:4px solid var(--melanzana); background:#f1ecf2; border-radius:12px; padding:12px 14px; margin-bottom:8px; font-size:14.5px; line-height:1.55; font-style:italic; }
   .speciale { border:1px dashed var(--ottone); background:#fffaf0; border-radius:14px; padding:12px 14px; margin-bottom:8px; font-size:14px; }
-  .speciale b { font-family:var(--serif); font-size:16px; }
+  .speciale b { font-family:var(--serif); font-size:18px; }
   table.prezzi { width:100%; border-collapse:collapse; font-size:14px; }
   table.prezzi td { padding:7px 4px; border-bottom:1px solid var(--linea); vertical-align:top; }
   table.prezzi td.n { text-align:right; font-weight:600; white-space:nowrap; }
@@ -195,7 +201,7 @@
 </head>
 <body>
 <header>
-  <div class="marchio">Catalogo<small id="sottotitolo">Prime edizioni da collezione</small></div>
+  <div class="marchio-box"><img class="emblema" src="img/logo.png" alt=""><div class="marchio">Linceo<small id="sottotitolo">Prime edizioni da collezione</small></div></div>
   <button class="esci" id="esci" hidden>Esci</button>
 </header>
 
@@ -203,6 +209,7 @@
   <!-- Accesso -->
   <section id="login" hidden>
     <form class="login" id="form-login">
+      <img class="login-logo" src="img/logo-intero.jpg" alt="Linceo">
       <h2>Bentornato</h2>
       <p class="sotto">Accedi per consultare il tuo catalogo.</p>
       <label>Email<input type="email" id="email" required autocomplete="username"></label>
