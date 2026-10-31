@@ -69,6 +69,14 @@
   .tessera span { font-size:12px; opacity:.85; font-weight:400; }
   .tessera.barcode { background:linear-gradient(140deg, var(--verde), var(--verde2)); }
   .tessera.foto { background:linear-gradient(140deg, #5e4329, var(--ottone)); }
+  .tessera.sbn { background:linear-gradient(140deg, #4a3423, #7a5a3c); }
+  .tessera.antico { background:linear-gradient(140deg, #2a1f17, #6b4c2c); }
+  .tessera.chiara { background:var(--bianco); color:var(--verde); }
+  .etichetta-ricerca { font-size:12.5px; font-weight:600; color:var(--ottone-testo); text-transform:uppercase; letter-spacing:.6px; margin:6px 2px 8px; }
+  .segmenti { display:grid; grid-template-columns:1fr 1fr; background:var(--salvia); border-radius:12px; padding:4px; margin-bottom:14px; }
+  .segmenti button { border:none; background:none; border-radius:9px; padding:10px 6px; font-size:14px; font-weight:600; color:var(--grigio); }
+  .segmenti button.attivo { background:var(--bianco); color:var(--verde); box-shadow:var(--ombra); }
+  .doppioni { display:inline-block; margin-top:6px; font-size:12px; color:var(--grigio); }
   .tessera:disabled { opacity:.5; }
   .barra-ricerca { display:flex; gap:8px; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:4px 4px 4px 12px; box-shadow:var(--ombra); }
   .barra-ricerca svg { width:18px; height:18px; color:var(--grigio); flex-shrink:0; }
@@ -190,8 +198,9 @@
   .modulo .due { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .modulo label { margin-bottom:10px; }
 
-  nav.schede { position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(255,253,249,.95); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  nav.schede { position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(253,250,244,.97); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
     border-top:1px solid var(--linea); display:flex; padding-bottom:env(safe-area-inset-bottom); }
+  nav.schede::after { content:""; position:absolute; left:0; right:0; top:100%; height:160px; background:#fdfaf4; }
   nav.schede button { flex:1; height:var(--tab); background:none; border:none; color:var(--grigio); font-size:11.5px; font-weight:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; position:relative; }
   nav.schede svg { width:23px; height:23px; }
   nav.schede button.attiva { color:var(--verde); font-weight:600; }
@@ -230,6 +239,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
         <div><b>Foto</b><br><span>Copertina o frontespizio</span></div>
       </button>
+      <button class="tessera sbn" id="vai-sbn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="17.5" cy="16.5" r="3"/><path d="m21.5 20.5-1.8-1.8"/></svg>
+        <div><b>Ricerca SBN</b><br><span>Autore, titolo, editore, anni</span></div>
+      </button>
+      <button class="tessera antico" id="vai-antico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>
+        <div><b>Libro antico</b><br><span>Stampati fino al 1830</span></div>
+      </button>
     </div>
     <input type="file" id="file-foto" accept="image/*" capture="environment" hidden>
     <div id="lettore" hidden></div>
@@ -247,6 +264,7 @@
       <button class="btn btn-tenue" id="foto-annulla">Annulla</button>
     </div>
 
+    <div class="etichetta-ricerca">Ricerca veloce</div>
     <form class="barra-ricerca" id="form-cerca">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="campo" placeholder="ISBN, titolo o autore" autocomplete="off" aria-label="Cerca per ISBN, titolo o autore">
@@ -258,16 +276,21 @@
 
   <!-- Libro antico -->
   <section id="vista-antico" hidden>
-    <h2 class="h2">Libro antico</h2>
-    <p class="intro">Per i libri stampati fino al 1830, senza barcode. Scrivi quello che leggi su frontespizio e colophon: l'app cerca solo nel fondo antico di SBN (che include EDIT16) e mostra le edizioni dalla più vecchia.</p>
+    <h2 class="h2" id="a-titolo-vista">Ricerca SBN</h2>
+    <div class="segmenti" id="a-epoca">
+      <button type="button" data-epoca="moderno" class="attivo">Dal 1831 a oggi</button>
+      <button type="button" data-epoca="antico">Libro antico</button>
+    </div>
+    <p class="intro" id="a-intro"></p>
     <form class="modulo" id="form-antico">
-      <label>Autore<input id="a-autore" placeholder="es. Ariosto" autocomplete="off"></label>
-      <label>Titolo<input id="a-titolo" placeholder="es. Orlando furioso" autocomplete="off"></label>
-      <label>Tipografo o parola del frontespizio<input id="a-altro" placeholder="es. Giolito" autocomplete="off"></label>
-      <label>Luogo di stampa<input id="a-luogo" placeholder="es. Venezia (vale anche Vinegia, Venetiis…)" autocomplete="off"></label>
+      <label>Autore<input id="a-autore" placeholder="es. Pavese" autocomplete="off"></label>
+      <label>Titolo<input id="a-titolo" placeholder="es. Lavorare stanca" autocomplete="off"></label>
+      <label id="a-editore-box">Editore<input id="a-editore" placeholder="es. Solaria, Einaudi" autocomplete="off"></label>
+      <label id="a-altro-box" hidden>Tipografo o parola del frontespizio<input id="a-altro" placeholder="es. Giolito" autocomplete="off"></label>
+      <label>Luogo di stampa<input id="a-luogo" placeholder="es. Torino" autocomplete="off"></label>
       <div class="due">
-        <label>Anno da<input id="a-da" inputmode="numeric" placeholder="1500" autocomplete="off"></label>
-        <label>Anno a<input id="a-a" inputmode="numeric" placeholder="1600" autocomplete="off"></label>
+        <label>Anno da<input id="a-da" inputmode="numeric" placeholder="1930" autocomplete="off"></label>
+        <label>Anno a<input id="a-a" inputmode="numeric" placeholder="1945" autocomplete="off"></label>
       </div>
       <button type="submit" class="btn btn-verde">Cerca edizioni</button>
     </form>
@@ -308,6 +331,11 @@
     </div>
     <div class="conteggio" id="conteggio"></div>
     <div id="elenco"></div>
+    <div class="riquadro" style="margin-top:22px">
+      <b>Copia di sicurezza</b>
+      <p class="intro" style="margin:6px 0 0">Ogni domenica Linceo salva da solo una copia del catalogo e del Taccuino. Con questo pulsante ne scarichi una adesso sul telefono: conservala in iCloud Drive o Google Drive, nella cartella "Linceo – Backup".</p>
+      <button class="btn btn-verde" id="scarica-backup">Scarica copia adesso</button>
+    </div>
   </section>
 </main>
 
@@ -323,7 +351,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Cerca
   </button>
   <button data-vista="antico">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>Antico
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>SBN
   </button>
   <button data-vista="taccuino">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12.5 8H16M12.5 12H16"/></svg>Taccuino
@@ -401,6 +429,33 @@ $("form-login").addEventListener("submit", async (e) => {
   mostraSchermata();
 });
 $("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; taccuino = []; mostraSchermata(); });
+
+// ---------- Copia di sicurezza ----------
+$("scarica-backup").addEventListener("click", async () => {
+  const b = $("scarica-backup");
+  b.disabled = true; b.textContent = "Preparo la copia…";
+  try {
+    const { data, error } = await sb.rpc("scarica_backup");
+    if (error) throw error;
+    const oggi = new Date().toISOString().slice(0, 10);
+    const nome = `linceo-backup-${oggi}.json`;
+    const file = new File([JSON.stringify(data, null, 1)], nome, { type: "application/json" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: nome }); }
+      catch (e) { if (e && e.name === "AbortError") { avvisa("Copia annullata."); return; } throw e; }
+    } else {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement("a");
+      a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+    avvisa(`Copia pronta: ${data.edizioni.length} edizioni.`);
+  } catch (e) {
+    avvisa("Non riesco a creare la copia: " + (e.message || e));
+  } finally {
+    b.disabled = false; b.textContent = "Scarica copia adesso";
+  }
+});
 
 // ---------- Navigazione ----------
 let vistaAttiva = "cerca";
@@ -637,7 +692,7 @@ async function apriDettaglioSbn(codice, dalTaccuino) {
   $("d-salva").onclick = async () => {
     $("d-salva").disabled = true;
     const ok = await salvaNelTaccuino({
-      origine: ultimaRichiesta && ultimaRichiesta.azione === "antico" ? "antico" : "testo",
+      origine: ultimaRichiesta && ultimaRichiesta.azione === "antico" && ultimaRichiesta.epoca !== "moderno" ? "antico" : "testo",
       testo: [s.autore, s.titolo].filter(Boolean).join(" — ").slice(0, 300),
       campi: ultimaRichiesta && ultimaRichiesta.azione === "antico" ? ultimaRichiesta : null,
       codice_sbn: s.codice_sbn,
@@ -786,6 +841,7 @@ function edizioneSbn(r, etichetta, oro) {
       <div class="tit">${esc(r.titolo)}</div>
       <div class="pub">${esc(r.pubblicazione || "")}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</div>
       ${r.codice_edit16 ? `<span class="pill edit16" style="margin-top:6px">EDIT16 · ${esc(r.codice_edit16)}</span>` : ""}
+      ${r.schede_uguali > 1 ? `<span class="doppioni">Registrata ${r.schede_uguali} volte in SBN</span>` : ""}
     </div>
   </button>`;
 }
@@ -871,17 +927,44 @@ async function mostraRisultati(d, contesto) {
 // ==================================================================
 // LIBRO ANTICO
 // ==================================================================
+let epocaRicerca = "moderno";
+const TESTI_EPOCA = {
+  moderno: { titolo: "Ricerca SBN", intro: "Compila solo i campi che conosci: più campi metti, meno titoli simili ti ritrovi. Le edizioni arrivano dalla più vecchia, così la candidata prima edizione è in cima.", luogo: "es. Torino", da: "1930", a: "1945" },
+  antico: { titolo: "Libro antico", intro: "Per i libri stampati fino al 1830, senza barcode. Scrivi quello che leggi su frontespizio e colophon: l'app cerca solo nel fondo antico di SBN (che include EDIT16) e mostra le edizioni dalla più vecchia.", luogo: "es. Venezia (vale anche Vinegia, Venetiis…)", da: "1500", a: "1600" }
+};
+function impostaEpoca(ep) {
+  epocaRicerca = ep;
+  const t = TESTI_EPOCA[ep];
+  $("a-titolo-vista").textContent = t.titolo;
+  $("a-intro").textContent = t.intro;
+  $("a-luogo").placeholder = t.luogo; $("a-da").placeholder = t.da; $("a-a").placeholder = t.a;
+  $("a-autore").placeholder = ep === "antico" ? "es. Ariosto" : "es. Pavese";
+  $("a-titolo").placeholder = ep === "antico" ? "es. Orlando furioso" : "es. Lavorare stanca";
+  $("a-editore-box").hidden = ep === "antico";
+  $("a-altro-box").hidden = ep !== "antico";
+  document.querySelectorAll("#a-epoca button").forEach(b => b.classList.toggle("attivo", b.dataset.epoca === ep));
+}
+document.querySelectorAll("#a-epoca button").forEach(b => b.addEventListener("click", () => {
+  if (b.dataset.epoca !== epocaRicerca) { $("a-risultati").innerHTML = ""; $("a-stato").textContent = ""; }
+  impostaEpoca(b.dataset.epoca);
+}));
+impostaEpoca("moderno");
+$("vai-sbn").addEventListener("click", () => { impostaEpoca("moderno"); vai("antico"); });
+$("vai-antico").addEventListener("click", () => { impostaEpoca("antico"); vai("antico"); });
+
 $("form-antico").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const antico = epocaRicerca === "antico";
   const corpo = {
-    azione: "antico",
-    autore: $("a-autore").value.trim(), titolo: $("a-titolo").value.trim(), altro: $("a-altro").value.trim(),
+    azione: "antico", epoca: epocaRicerca,
+    autore: $("a-autore").value.trim(), titolo: $("a-titolo").value.trim(),
+    editore: antico ? "" : $("a-editore").value.trim(), altro: antico ? $("a-altro").value.trim() : "",
     luogo: $("a-luogo").value.trim(), anno_da: $("a-da").value.trim(), anno_a: $("a-a").value.trim()
   };
-  if (!corpo.autore && !corpo.titolo && !corpo.altro) { $("a-stato").innerHTML = '<span class="errore">Scrivi almeno autore, titolo o una parola del frontespizio.</span>'; return; }
+  if (!corpo.autore && !corpo.titolo && !corpo.altro && !corpo.editore) { $("a-stato").innerHTML = '<span class="errore">Scrivi almeno autore, titolo o editore.</span>'; return; }
   ultimaRichiesta = corpo;
   $("a-risultati").innerHTML = "";
-  $("a-stato").textContent = "Cerco nel fondo antico di SBN…";
+  $("a-stato").textContent = antico ? "Cerco nel fondo antico di SBN…" : "Cerco in SBN…";
   let d;
   try { d = await chiama(corpo); }
   catch (err) { $("a-stato").innerHTML = '<span class="errore">' + esc(err.message) + '</span>'; return; }
@@ -893,9 +976,10 @@ $("form-antico").addEventListener("submit", async (e) => {
   else {
     h += `<h3 class="sezione">Edizioni in SBN (${s.risultati.length})</h3>`;
     if (s.avviso) h += `<p class="avviso">${esc(s.avviso)}</p>`;
+    if (s.accorpati) h += `<p class="intro" style="margin:0 2px 8px">Ho unito ${s.accorpati} ${s.accorpati === 1 ? "scheda uguale" : "schede uguali"} registrate più volte.</p>`;
     h += s.risultati.length
       ? `<p class="intro" style="margin:0 2px 10px">Tocca un'edizione per la scheda completa e il confronto con la tua copia.</p>` + s.risultati.map((r, i) => edizioneSbn(r, i === 0 ? "La più antica trovata" : "", i === 0)).join("")
-      : `<div class="vuoto">Nessuna edizione corrisponde. Prova a togliere il luogo o ad allargare gli anni: sui frontespizi antichi i nomi cambiano grafia.</div>`;
+      : `<div class="vuoto">${antico ? "Nessuna edizione corrisponde. Prova a togliere il luogo o ad allargare gli anni: sui frontespizi antichi i nomi cambiano grafia." : "Nessuna edizione corrisponde. Prova a togliere l'editore o il luogo, o ad allargare gli anni."}</div>`;
   }
   $("a-risultati").innerHTML = h;
 });
