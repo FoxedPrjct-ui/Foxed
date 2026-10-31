@@ -14,11 +14,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   :root {
-    --verde:#173226; --verde2:#24503b; --ottone:#b48a3a; --ottone-chiaro:#f4e9d0;
-    --carta:#f5f1e8; --bianco:#fffdf9; --inchiostro:#1d1d1b; --grigio:#6e6a60; --linea:#e6dfd0;
+    --verde:#173226; --verde2:#24503b; --ottone:#b48a3a; --ottone-chiaro:#f4e9d0; --ottone-testo:#6b5520;
+    --carta:#f5f1e8; --bianco:#fffdf9; --inchiostro:#1d1d1b; --grigio:#625e55; --linea:#e6dfd0;
     --bordeaux:#8a2f2f; --bordeaux-chiaro:#f7e6e3; --salvia:#e3e9df; --melanzana:#4a3550;
     --ombra:0 1px 2px rgba(23,50,38,.06), 0 4px 14px rgba(23,50,38,.07);
     --serif:"Fraunces", Georgia, serif; --sans:"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -28,72 +27,86 @@
   html, body { margin:0; background:var(--carta); color:var(--inchiostro); font-family:var(--sans); font-size:15px; }
   button { font-family:inherit; cursor:pointer; }
   [hidden] { display:none !important; }
+  a { color:var(--verde2); }
 
-  /* Header */
   header { position:sticky; top:0; z-index:20; background:linear-gradient(135deg, var(--verde), var(--verde2)); color:#fff;
     padding:calc(12px + env(safe-area-inset-top)) 18px 14px; display:flex; align-items:flex-end; justify-content:space-between; }
   .marchio { font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:.3px; line-height:1; }
-  .marchio small { display:block; font-family:var(--sans); font-size:12px; font-weight:400; opacity:.75; margin-top:4px; letter-spacing:.4px; }
+  .marchio small { display:block; font-family:var(--sans); font-size:12px; font-weight:400; opacity:.8; margin-top:4px; letter-spacing:.4px; }
   .esci { background:rgba(255,255,255,.12); color:#fff; border:none; border-radius:20px; padding:7px 12px; font-size:13px; }
 
   main { padding:16px 16px calc(var(--tab) + 24px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
 
-  /* Login */
   .login { max-width:380px; margin:12vh auto 0; background:var(--bianco); border-radius:20px; padding:26px 22px; box-shadow:var(--ombra); }
   .login h2 { font-family:var(--serif); font-weight:600; margin:0 0 4px; font-size:24px; color:var(--verde); }
   .login p.sotto { color:var(--grigio); margin:0 0 18px; font-size:14px; }
   label { display:block; font-size:13px; color:var(--grigio); margin-bottom:12px; }
   input, textarea, select { width:100%; padding:12px 14px; font-size:16px; border:1px solid var(--linea); border-radius:12px; background:#fff; margin-top:5px; font-family:inherit; color:var(--inchiostro); outline:none; }
   input:focus, textarea:focus, select:focus { border-color:var(--ottone); box-shadow:0 0 0 3px rgba(180,138,58,.15); }
-  .btn { border:none; border-radius:12px; padding:13px 16px; font-size:15px; font-weight:600; }
+  .btn { border:none; border-radius:12px; padding:13px 16px; font-size:15px; font-weight:600; min-height:44px; }
   .btn-verde { background:var(--verde); color:#fff; width:100%; }
+  .btn-ottone { background:var(--ottone); color:#fff; }
   .btn-tenue { background:var(--salvia); color:var(--verde); width:100%; margin-top:8px; }
+  .btn-rosso { background:var(--bordeaux-chiaro); color:var(--bordeaux); }
+  .btn:disabled { opacity:.5; }
+  .riga-btn { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .riga-btn .btn { flex:1 1 140px; }
   .errore { color:var(--bordeaux); font-size:14px; }
+  .h2 { font-family:var(--serif); font-size:22px; font-weight:600; color:var(--verde); margin:4px 2px 4px; }
+  .intro { color:var(--grigio); font-size:14px; margin:0 2px 14px; line-height:1.5; }
 
   /* Cerca */
   .tessere { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
   .tessera { border:none; border-radius:18px; padding:20px 14px; color:#fff; text-align:left; box-shadow:var(--ombra); display:flex; flex-direction:column; gap:10px; min-height:118px; }
   .tessera svg { width:30px; height:30px; }
   .tessera b { font-size:16px; font-weight:600; }
-  .tessera span { font-size:12px; opacity:.8; font-weight:400; }
+  .tessera span { font-size:12px; opacity:.85; font-weight:400; }
   .tessera.barcode { background:linear-gradient(140deg, var(--verde), var(--verde2)); }
-  .tessera.foto { background:linear-gradient(140deg, #9c7429, var(--ottone)); }
+  .tessera.foto { background:linear-gradient(140deg, #8f6a24, var(--ottone)); }
   .tessera:disabled { opacity:.5; }
   .barra-ricerca { display:flex; gap:8px; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:4px 4px 4px 12px; box-shadow:var(--ombra); }
   .barra-ricerca svg { width:18px; height:18px; color:var(--grigio); flex-shrink:0; }
   .barra-ricerca input { border:none; margin:0; padding:10px 4px; box-shadow:none; background:transparent; }
-  .barra-ricerca button { background:var(--verde); color:#fff; border:none; border-radius:10px; padding:10px 14px; font-weight:600; font-size:14px; }
+  .barra-ricerca button { background:var(--verde); color:#fff; border:none; border-radius:10px; padding:10px 14px; font-weight:600; font-size:14px; min-height:40px; }
   #lettore { width:100%; border-radius:16px; overflow:hidden; margin-bottom:8px; }
-  #anteprima { width:100%; max-height:240px; object-fit:contain; border-radius:16px; background:var(--bianco); margin:4px 0 8px; }
-  #stato { font-size:14px; color:var(--grigio); min-height:20px; margin:10px 2px; }
+  .anteprima-foto { width:100%; max-height:260px; object-fit:contain; border-radius:16px; background:var(--bianco); margin:4px 0 8px; }
+  .stato { font-size:14px; color:var(--grigio); min-height:20px; margin:10px 2px; }
 
-  h3.sezione { font-family:var(--sans); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:var(--ottone); margin:22px 2px 10px; }
+  h3.sezione { font-family:var(--sans); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:var(--ottone-testo); margin:22px 2px 10px; }
   .riquadro { background:var(--bianco); border-radius:16px; padding:14px; margin-bottom:10px; box-shadow:var(--ombra); }
   .riquadro.oro { background:#fffaf0; border:1px solid var(--ottone-chiaro); }
+  .riquadro.salvato { background:var(--salvia); }
   .etichetta { font-size:12px; color:var(--grigio); text-transform:uppercase; letter-spacing:.8px; margin:0 0 6px; }
   .t-serif { font-family:var(--serif); font-size:19px; font-weight:600; margin:0 0 2px; line-height:1.25; }
   .t-autore { margin:0 0 6px; }
   .t-meta { color:var(--grigio); font-size:14px; margin:0 0 6px; }
-  a { color:var(--verde2); }
-  .avviso { font-size:13px; color:#6b5520; background:var(--ottone-chiaro); padding:9px 12px; border-radius:10px; margin:8px 0; }
+  .avviso { font-size:13px; color:var(--ottone-testo); background:var(--ottone-chiaro); padding:9px 12px; border-radius:10px; margin:8px 0; line-height:1.45; }
   .riga { display:flex; gap:12px; align-items:flex-start; background:var(--bianco); border-radius:12px; padding:10px 12px; margin-bottom:6px; font-size:14px; box-shadow:var(--ombra); }
   .riga img { width:46px; border-radius:4px; flex-shrink:0; }
-  details > summary { cursor:pointer; color:var(--verde2); font-weight:600; font-size:14px; padding:6px 2px; }
+  details > summary { cursor:pointer; color:var(--verde2); font-weight:600; font-size:14px; padding:8px 2px; }
+  .vuoto { color:var(--grigio); font-size:14px; text-align:center; padding:30px 10px; }
+
+  /* Schede SBN cliccabili */
+  .ed { display:flex; width:100%; text-align:left; border:none; background:var(--bianco); border-radius:14px; padding:12px 14px; margin-bottom:8px; box-shadow:var(--ombra); color:inherit; gap:12px; align-items:flex-start; font-size:14px; }
+  .ed .anno { font-family:var(--serif); font-weight:600; font-size:18px; color:var(--verde); min-width:46px; }
+  .ed .corpo { flex:1; min-width:0; }
+  .ed .tit { font-weight:600; margin-bottom:3px; line-height:1.35; }
+  .ed .pub { color:var(--grigio); line-height:1.35; }
+  .ed.oro { background:#fffaf0; border:1px solid var(--ottone-chiaro); }
 
   /* Catalogo */
   .strumenti { position:sticky; top:calc(64px + env(safe-area-inset-top)); z-index:10; background:var(--carta); padding:4px 0 8px; }
   .chips { display:flex; gap:8px; overflow-x:auto; padding:10px 2px 4px; scrollbar-width:none; }
   .chips::-webkit-scrollbar { display:none; }
-  .chip { flex-shrink:0; border:1px solid var(--linea); background:var(--bianco); color:var(--inchiostro); border-radius:20px; padding:7px 12px; font-size:13px; font-weight:500; }
+  .chip { flex-shrink:0; border:1px solid var(--linea); background:var(--bianco); color:var(--inchiostro); border-radius:20px; padding:8px 12px; font-size:13px; font-weight:500; min-height:36px; }
   .chip i { font-style:normal; color:var(--grigio); margin-left:4px; font-size:12px; }
   .chip.attivo { background:var(--verde); color:#fff; border-color:var(--verde); }
-  .chip.attivo i { color:rgba(255,255,255,.7); }
+  .chip.attivo i { color:rgba(255,255,255,.75); }
   .filtri { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px; }
   .filtri select { margin:0; padding:9px 12px; font-size:14px; border-radius:10px; }
   .conteggio { font-size:13px; color:var(--grigio); margin:8px 2px 10px; }
 
   .libro { display:flex; width:100%; text-align:left; border:none; background:var(--bianco); border-radius:16px; padding:0; margin-bottom:10px; box-shadow:var(--ombra); overflow:hidden; color:inherit; }
-  .libro:active { transform:scale(.99); }
   .nastro { width:6px; flex-shrink:0; background:var(--verde); }
   .s-verificata_fonte_singola .nastro { background:#5c8a6c; }
   .s-stima_ai .nastro { background:#a9a397; }
@@ -102,21 +115,44 @@
   .libro-autore { font-size:14px; margin-bottom:4px; }
   .libro-meta { font-size:13px; color:var(--grigio); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .libro-piede { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; align-items:center; }
-  .pill { font-size:11.5px; padding:3px 9px; border-radius:20px; background:var(--salvia); color:var(--verde); font-weight:500; }
-  .pill.prezzo { background:var(--ottone-chiaro); color:#6b5520; font-weight:600; }
+  .pill { display:inline-block; font-size:11.5px; padding:3px 9px; border-radius:20px; background:var(--salvia); color:var(--verde); font-weight:500; }
+  .pill.prezzo { background:var(--ottone-chiaro); color:var(--ottone-testo); font-weight:600; }
   .pill.stato-verificata { background:var(--verde); color:#fff; }
-  .pill.stato-verificata_fonte_singola { background:#5c8a6c; color:#fff; }
-  .pill.stato-stima_ai { background:#a9a397; color:#fff; }
-  .vuoto { color:var(--grigio); font-size:14px; text-align:center; padding:30px 10px; }
+  .pill.stato-verificata_fonte_singola { background:#4f7d5f; color:#fff; }
+  .pill.stato-stima_ai { background:#77736a; color:#fff; }
+  .pill.edit16 { background:var(--melanzana); color:#fff; }
 
-  /* Scheda completa */
+  /* Taccuino */
+  .voce { background:var(--bianco); border-radius:16px; box-shadow:var(--ombra); margin-bottom:10px; overflow:hidden; }
+  .voce-testa { display:flex; gap:12px; padding:12px 14px; align-items:flex-start; }
+  .voce-testa img, .voce-testa .senza-foto { width:58px; height:78px; object-fit:cover; border-radius:6px; flex-shrink:0; background:var(--salvia); }
+  .voce-testa .senza-foto { display:flex; align-items:center; justify-content:center; color:var(--verde); }
+  .voce-testa .senza-foto svg { width:24px; height:24px; }
+  .voce-corpo { flex:1; min-width:0; }
+  .voce-titolo { font-weight:600; line-height:1.3; margin-bottom:3px; }
+  .voce-dett { padding:0 14px 14px; }
+  .st { font-size:11.5px; padding:3px 9px; border-radius:20px; font-weight:600; }
+  .st-da_valutare { background:var(--salvia); color:var(--verde); }
+  .st-in_ricerca { background:#e6eef7; color:#1f4b7a; }
+  .st-proposta { background:var(--ottone-chiaro); color:var(--ottone-testo); }
+  .st-approvata { background:var(--verde); color:#fff; }
+  .st-scartata { background:#ecebe7; color:#55524b; }
+  .esito { border-radius:12px; padding:12px; margin:8px 0; font-size:14px; line-height:1.5; }
+  .esito-merita { background:#eaf2ec; border-left:4px solid var(--verde); }
+  .esito-non_merita { background:#ecebe7; border-left:4px solid #77736a; }
+  .esito-senza_prezzo { background:var(--ottone-chiaro); border-left:4px solid var(--ottone); }
+  .toast { position:fixed; left:16px; right:16px; bottom:calc(var(--tab) + 16px + env(safe-area-inset-bottom)); z-index:40; background:var(--verde); color:#fff; border-radius:14px; padding:12px 14px; display:flex; gap:10px; align-items:center; box-shadow:0 6px 24px rgba(0,0,0,.25); max-width:688px; margin:0 auto; font-size:14px; }
+  .toast span { flex:1; }
+  .toast button { background:rgba(255,255,255,.16); color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:600; min-height:36px; }
+
+  /* Foglio dettaglio */
   .foglio { position:fixed; inset:0; z-index:50; background:var(--carta); overflow-y:auto; transform:translateY(100%); transition:transform .28s ease; -webkit-overflow-scrolling:touch; }
   .foglio.aperto { transform:none; }
   .foglio-testa { position:sticky; top:0; z-index:2; background:linear-gradient(135deg, var(--verde), var(--verde2)); color:#fff; padding:calc(10px + env(safe-area-inset-top)) 14px 10px; display:flex; align-items:center; gap:10px; }
-  .chiudi { background:rgba(255,255,255,.14); border:none; color:#fff; border-radius:20px; width:36px; height:36px; font-size:20px; line-height:1; }
-  .foglio-testa span { font-size:13px; opacity:.8; }
+  .chiudi { background:rgba(255,255,255,.14); border:none; color:#fff; border-radius:22px; width:44px; height:44px; font-size:22px; line-height:1; }
+  .foglio-testa span { font-size:14px; opacity:.85; }
   .foglio-corpo { padding:18px 16px calc(40px + env(safe-area-inset-bottom)); max-width:720px; margin:0 auto; }
-  .copertina-titolo { font-family:var(--serif); font-size:27px; font-weight:600; line-height:1.15; margin:4px 0 6px; color:var(--verde); }
+  .copertina-titolo { font-family:var(--serif); font-size:25px; font-weight:600; line-height:1.18; margin:8px 0 6px; color:var(--verde); }
   .copertina-autore { font-size:17px; margin:0 0 12px; }
   .griglia { display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:14px; }
   .griglia dt { color:var(--grigio); }
@@ -132,15 +168,29 @@
   table.prezzi td { padding:7px 4px; border-bottom:1px solid var(--linea); vertical-align:top; }
   table.prezzi td.n { text-align:right; font-weight:600; white-space:nowrap; }
   .collegamenti { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
-  .collegamenti a { text-decoration:none; background:var(--salvia); color:var(--verde); padding:9px 13px; border-radius:12px; font-size:14px; font-weight:600; }
+  .collegamenti a { text-decoration:none; background:var(--salvia); color:var(--verde); padding:10px 13px; border-radius:12px; font-size:14px; font-weight:600; }
+  .controllo { display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--linea); }
+  .controllo:last-child { border-bottom:none; }
+  .controllo .num { width:26px; height:26px; border-radius:13px; background:var(--verde); color:#fff; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .controllo b { display:block; margin-bottom:3px; }
+  .controllo .valore { font-family:ui-monospace, SFMono-Regular, Menlo, monospace; background:var(--salvia); border-radius:6px; padding:2px 6px; font-size:13.5px; }
+  .copie { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; }
+  .copie a { display:block; background:var(--bianco); border-radius:12px; overflow:hidden; box-shadow:var(--ombra); text-decoration:none; color:var(--verde); font-size:13px; font-weight:600; }
+  .copie img { width:100%; height:150px; object-fit:cover; display:block; background:var(--salvia); }
+  .copie span { display:block; padding:8px 10px; }
 
-  /* Barra in basso */
-  nav.schede { position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(255,253,249,.94); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  /* Libro antico */
+  .modulo { background:var(--bianco); border-radius:16px; padding:16px; box-shadow:var(--ombra); }
+  .modulo .due { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .modulo label { margin-bottom:10px; }
+
+  nav.schede { position:fixed; left:0; right:0; bottom:0; z-index:30; background:rgba(255,253,249,.95); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
     border-top:1px solid var(--linea); display:flex; padding-bottom:env(safe-area-inset-bottom); }
-  nav.schede button { flex:1; height:var(--tab); background:none; border:none; color:var(--grigio); font-size:12px; font-weight:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
-  nav.schede svg { width:24px; height:24px; }
-  nav.schede button.attiva { color:var(--verde); }
+  nav.schede button { flex:1; height:var(--tab); background:none; border:none; color:var(--grigio); font-size:11.5px; font-weight:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; position:relative; }
+  nav.schede svg { width:23px; height:23px; }
+  nav.schede button.attiva { color:var(--verde); font-weight:600; }
   nav.schede button.attiva svg { color:var(--ottone); }
+  .bollino { position:absolute; top:8px; left:calc(50% + 6px); background:var(--bordeaux); color:#fff; font-size:10.5px; font-weight:700; border-radius:9px; min-width:18px; height:18px; padding:0 5px; display:flex; align-items:center; justify-content:center; }
 </style>
 </head>
 <body>
@@ -150,7 +200,7 @@
 </header>
 
 <main>
-  <!-- Login -->
+  <!-- Accesso -->
   <section id="login" hidden>
     <form class="login" id="form-login">
       <h2>Bentornato</h2>
@@ -166,43 +216,82 @@
   <section id="vista-cerca" hidden>
     <div class="tessere">
       <button class="tessera barcode" id="scansiona">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>
         <div><b>Barcode</b><br><span>Libri con ISBN</span></div>
       </button>
       <button class="tessera foto" id="fotografa">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
         <div><b>Foto</b><br><span>Copertina o frontespizio</span></div>
       </button>
     </div>
     <input type="file" id="file-foto" accept="image/*" capture="environment" hidden>
     <div id="lettore" hidden></div>
     <button id="annulla" class="btn btn-tenue" hidden>Annulla scansione</button>
-    <img id="anteprima" hidden alt="">
+
+    <div id="pannello-foto" class="riquadro" hidden>
+      <img id="anteprima" class="anteprima-foto" alt="Foto scattata">
+      <label>Autore e titolo (facoltativo)
+        <input id="testo-foto" placeholder="es. Pavese Lavorare stanca" autocomplete="off">
+      </label>
+      <div class="riga-btn">
+        <button class="btn btn-verde" id="foto-cerca">Cerca</button>
+        <button class="btn btn-tenue" id="foto-salva" style="margin-top:0">Salva nel Taccuino</button>
+      </div>
+      <button class="btn btn-tenue" id="foto-annulla">Annulla</button>
+    </div>
+
     <form class="barra-ricerca" id="form-cerca">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="campo" placeholder="ISBN, titolo o autore" autocomplete="off">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="campo" placeholder="ISBN, titolo o autore" autocomplete="off" aria-label="Cerca per ISBN, titolo o autore">
       <button type="submit">Cerca</button>
     </form>
-    <div id="stato"></div>
+    <div id="stato" class="stato" role="status"></div>
     <div id="risultati"></div>
+  </section>
+
+  <!-- Libro antico -->
+  <section id="vista-antico" hidden>
+    <h2 class="h2">Libro antico</h2>
+    <p class="intro">Per i libri stampati fino al 1830, senza barcode. Scrivi quello che leggi su frontespizio e colophon: l'app cerca solo nel fondo antico di SBN (che include EDIT16) e mostra le edizioni dalla più vecchia.</p>
+    <form class="modulo" id="form-antico">
+      <label>Autore<input id="a-autore" placeholder="es. Ariosto" autocomplete="off"></label>
+      <label>Titolo<input id="a-titolo" placeholder="es. Orlando furioso" autocomplete="off"></label>
+      <label>Tipografo o parola del frontespizio<input id="a-altro" placeholder="es. Giolito" autocomplete="off"></label>
+      <label>Luogo di stampa<input id="a-luogo" placeholder="es. Venezia (vale anche Vinegia, Venetiis…)" autocomplete="off"></label>
+      <div class="due">
+        <label>Anno da<input id="a-da" inputmode="numeric" placeholder="1500" autocomplete="off"></label>
+        <label>Anno a<input id="a-a" inputmode="numeric" placeholder="1600" autocomplete="off"></label>
+      </div>
+      <button type="submit" class="btn btn-verde">Cerca edizioni</button>
+    </form>
+    <div id="a-stato" class="stato" role="status"></div>
+    <div id="a-risultati"></div>
+  </section>
+
+  <!-- Taccuino -->
+  <section id="vista-taccuino" hidden>
+    <h2 class="h2">Taccuino</h2>
+    <p class="intro">I libri che hai cercato e che non sono nel catalogo. Con il Comando 6 li studio uno per uno con le Regole Ferree: qui trovi la proposta e decidi tu se aggiungerla.</p>
+    <div class="chips" id="t-filtri"></div>
+    <div id="t-elenco"></div>
   </section>
 
   <!-- Catalogo -->
   <section id="vista-catalogo" hidden>
     <div class="strumenti">
       <div class="barra-ricerca">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="filtro-testo" placeholder="Cerca nel catalogo" autocomplete="off">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="filtro-testo" placeholder="Cerca nel catalogo" autocomplete="off" aria-label="Cerca nel catalogo">
       </div>
       <div class="chips" id="chips"></div>
       <div class="filtri">
-        <select id="filtro-stato">
+        <select id="filtro-stato" aria-label="Affidabilità">
           <option value="tutti">Tutte le schede</option>
           <option value="verificata">Verificate</option>
           <option value="verificata_fonte_singola">Fonte singola</option>
           <option value="stima_ai">Stima AI</option>
         </select>
-        <select id="ordine">
+        <select id="ordine" aria-label="Ordinamento">
           <option value="autore">Ordina per autore</option>
           <option value="titolo">Ordina per titolo</option>
           <option value="anno-su">Anno (dal più antico)</option>
@@ -215,18 +304,26 @@
   </section>
 </main>
 
-<!-- Scheda completa -->
 <div class="foglio" id="foglio" aria-hidden="true">
-  <div class="foglio-testa"><button class="chiudi" id="chiudi-foglio" aria-label="Chiudi">‹</button><span>Scheda</span></div>
+  <div class="foglio-testa"><button class="chiudi" id="chiudi-foglio" aria-label="Chiudi">‹</button><span id="foglio-titolo">Scheda</span></div>
   <div class="foglio-corpo" id="foglio-corpo"></div>
 </div>
 
+<div class="toast" id="toast" hidden role="status"><span id="toast-testo"></span><button id="toast-azione" hidden></button></div>
+
 <nav class="schede" id="barra" hidden>
   <button data-vista="cerca" class="attiva">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Cerca
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Cerca
+  </button>
+  <button data-vista="antico">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>Antico
+  </button>
+  <button data-vista="taccuino">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12.5 8H16M12.5 12H16"/></svg>Taccuino
+    <span class="bollino" id="bollino" hidden></span>
   </button>
   <button data-vista="catalogo">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a1 1 0 0 1 1-1h3v16H5a1 1 0 0 1-1-1zM8 4h4v16H8zM13.5 5.2l3.4-.9 3.6 13.5-3.4.9z"/></svg>Catalogo
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5a1 1 0 0 1 1-1h3v16H5a1 1 0 0 1-1-1zM8 4h4v16H8zM13.5 5.2l3.4-.9 3.6 13.5-3.4.9z"/></svg>Catalogo
   </button>
 </nav>
 
@@ -238,15 +335,30 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = (id) => document.getElementById(id);
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const linkSicuro = (u) => /^https:\/\//i.test(u || "") ? esc(u) : "#";
-const norm = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const norm = (t) => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const ETICHETTE = { verificata:"Verificata", verificata_fonte_singola:"Fonte singola", stima_ai:"Stima AI" };
+const STATI_T = { da_valutare:"Da valutare", in_ricerca:"In ricerca", proposta:"Proposta pronta", approvata:"Nel catalogo", scartata:"Scartata" };
+const ESITI = { merita:"Merita il catalogo", non_merita:"Non merita il catalogo", senza_prezzo:"Nessun prezzo reale trovato" };
 const SOGLIA = 0.6;
 
-let lettore = null, workerOcr = null, ultimaRichiesta = null;
+let utente = null;
+let lettore = null, ultimaRichiesta = null;
 let catalogo = [], caricato = false;
 const filtro = { q:"", genere:"Tutti", stato:"tutti", ordine:"autore" };
+let fotoCorrente = null;          // { grande: Blob, anteprima: base64 }
+let taccuino = [], filtroT = "attivi";
 
-// ---------- Categorie ----------
+// ---------- Utilità ----------
+function avvisa(testo, azione, etichetta) {
+  $("toast-testo").textContent = testo;
+  const b = $("toast-azione");
+  b.hidden = !azione; b.textContent = etichetta || ""; b.onclick = azione ? async () => { $("toast").hidden = true; await azione(); } : null;
+  $("toast").hidden = false;
+  clearTimeout(avvisa._t); avvisa._t = setTimeout(() => { $("toast").hidden = true; }, azione ? 7000 : 3500);
+}
+function dataBreve(d) { try { return new Date(d).toLocaleDateString("it-IT", { day:"numeric", month:"short", year:"numeric" }); } catch (_) { return ""; } }
+
+// ---------- Categorie del catalogo ----------
 const MACRO = [
   ["Poesia", /poesia|poesie/], ["Fantascienza", /fantascienza/], ["Fantasy", /fantasy|fantastico/],
   ["Horror", /horror|gotico/], ["Giallo", /giallo|noir/], ["Fumetto", /fumetto/], ["Teatro", /teatro/],
@@ -258,16 +370,21 @@ function prezzoBreve(m) {
   const r = String(m || "").slice(0, 140).match(/(\d{1,3}(?:[.\s]\d{3})*(?:\s?[-–]\s?\d{1,3}(?:[.\s]\d{3})*)?)\s?€/);
   return r ? r[1].replace(/\s/g, "") + " €" : null;
 }
+function permalinkSbn(codice) {
+  const m = String(codice || "").match(/^IT\\ICCU\\([A-Z0-9]{2,4})\\(\d{5,7})$/);
+  return m ? "https://id.sbn.it/bid/" + m[1] + m[2] : null;
+}
 
 // ---------- Accesso ----------
 async function mostraSchermata() {
   const { data } = await sb.auth.getSession();
-  const dentro = !!data.session;
+  utente = data.session ? data.session.user : null;
+  const dentro = !!utente;
   $("login").hidden = dentro;
   $("barra").hidden = !dentro;
   $("esci").hidden = !dentro;
-  if (dentro) { vai(vistaAttiva); if (!caricato) caricaCatalogo(); }
-  else { $("vista-cerca").hidden = true; $("vista-catalogo").hidden = true; }
+  if (dentro) { vai(vistaAttiva); if (!caricato) caricaCatalogo(); caricaTaccuino(); }
+  else ["vista-cerca","vista-antico","vista-taccuino","vista-catalogo"].forEach(id => $(id).hidden = true);
 }
 $("form-login").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -276,25 +393,50 @@ $("form-login").addEventListener("submit", async (e) => {
   if (error) $("login-errore").textContent = "Accesso non riuscito: controlla email e password.";
   mostraSchermata();
 });
-$("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; mostraSchermata(); });
+$("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; taccuino = []; mostraSchermata(); });
 
 // ---------- Navigazione ----------
 let vistaAttiva = "cerca";
 function vai(v) {
   vistaAttiva = v;
-  $("vista-cerca").hidden = v !== "cerca";
-  $("vista-catalogo").hidden = v !== "catalogo";
+  ["cerca","antico","taccuino","catalogo"].forEach(n => $("vista-" + n).hidden = n !== v);
   document.querySelectorAll("nav.schede button").forEach(b => b.classList.toggle("attiva", b.dataset.vista === v));
+  if (v === "taccuino") caricaTaccuino();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll("nav.schede button").forEach(b => b.addEventListener("click", () => {
-  if (v_chiusuraFoglio()) return;
-  if (b.dataset.vista === "cerca" && vistaAttiva === "cerca") return;
+  if ($("foglio").classList.contains("aperto")) { history.back(); return; }
   vai(b.dataset.vista);
 }));
-function v_chiusuraFoglio() { if ($("foglio").classList.contains("aperto")) { history.back(); return true; } return false; }
 
-// ---------- Catalogo ----------
+// ---------- Foglio (schede a tutto schermo) ----------
+function apriFoglio(titolo, html) {
+  history.pushState({ foglio: true }, "");
+  $("foglio-titolo").textContent = titolo;
+  $("foglio-corpo").innerHTML = html;
+  $("foglio").classList.add("aperto");
+  $("foglio").setAttribute("aria-hidden", "false");
+  $("foglio").scrollTop = 0;
+}
+window.addEventListener("popstate", () => { $("foglio").classList.remove("aperto"); $("foglio").setAttribute("aria-hidden", "true"); });
+$("chiudi-foglio").addEventListener("click", () => history.back());
+
+// ---------- Chiamata al server ----------
+async function chiama(corpo) {
+  const { data, error } = await sb.functions.invoke("cerca", { body: corpo });
+  if (error) {
+    const stato = error.context && error.context.status;
+    if (stato === 401) { await sb.auth.signOut(); mostraSchermata(); throw new Error("Sessione scaduta: rientra."); }
+    let dettaglio = "Errore di collegamento. Riprova tra poco.";
+    try { const j = await error.context.json(); if (j && j.errore) dettaglio = j.errore; } catch (_) {}
+    throw new Error(dettaglio);
+  }
+  return data;
+}
+
+// ==================================================================
+// CATALOGO
+// ==================================================================
 async function caricaCatalogo() {
   $("conteggio").textContent = "Carico il catalogo…";
   const { data, error } = await sb.from("edizioni")
@@ -307,7 +449,6 @@ async function caricaCatalogo() {
   $("sottotitolo").textContent = catalogo.length + " edizioni in catalogo";
   disegnaCatalogo();
 }
-
 function disegnaChips() {
   const conti = {};
   catalogo.forEach(x => conti[x.macro] = (conti[x.macro] || 0) + 1);
@@ -316,10 +457,7 @@ function disegnaChips() {
   $("chips").innerHTML = voci.map(([n, c]) =>
     `<button class="chip ${filtro.genere === n ? "attivo" : ""}" data-genere="${esc(n)}">${esc(n)}<i>${c}</i></button>`).join("");
 }
-$("chips").addEventListener("click", (e) => {
-  const b = e.target.closest("[data-genere]"); if (!b) return;
-  filtro.genere = b.dataset.genere; disegnaCatalogo();
-});
+$("chips").addEventListener("click", (e) => { const b = e.target.closest("[data-genere]"); if (!b) return; filtro.genere = b.dataset.genere; disegnaCatalogo(); });
 $("filtro-testo").addEventListener("input", (e) => { filtro.q = norm(e.target.value.trim()); disegnaCatalogo(); });
 $("filtro-stato").addEventListener("change", (e) => { filtro.stato = e.target.value; disegnaCatalogo(); });
 $("ordine").addEventListener("change", (e) => { filtro.ordine = e.target.value; disegnaCatalogo(); });
@@ -343,7 +481,7 @@ function disegnaCatalogo() {
 }
 function cartolina(x) {
   const meta = [x.editore, x.anno].filter(Boolean).map(esc).join(" · ");
-  return `<button class="libro s-${esc(x.stato_verifica)}" data-id="${esc(x.id)}">
+  return `<button class="libro s-${esc(x.stato_verifica)}" data-scheda="${esc(x.id)}">
     <div class="nastro"></div>
     <div class="libro-corpo">
       <div class="libro-titolo">${esc(x.titolo)}</div>
@@ -351,32 +489,24 @@ function cartolina(x) {
       <div class="libro-meta">${meta}</div>
       <div class="libro-piede">
         ${x.prezzo ? `<span class="pill prezzo">${esc(x.prezzo)}</span>` : ""}
-        <span class="pill">${esc(x.macro)}</span>
+        <span class="pill">${esc(x.macro || macroGenere(x.genere))}</span>
         <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
       </div>
     </div>
   </button>`;
 }
-$("elenco").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) apriScheda(b.dataset.id); });
+document.addEventListener("click", (e) => {
+  const s = e.target.closest("[data-scheda]"); if (s) { apriScheda(s.dataset.scheda); return; }
+  const d = e.target.closest("[data-sbn]"); if (d) { apriDettaglioSbn(d.dataset.sbn, !!d.closest("#t-elenco")); return; }
+});
 
-// ---------- Scheda completa ----------
-function apriScheda(id) {
-  history.pushState({ scheda: id }, "");
-  $("foglio-corpo").innerHTML = `<div class="vuoto">Carico la scheda…</div>`;
-  $("foglio").classList.add("aperto");
-  $("foglio").scrollTop = 0;
-  caricaScheda(id);
-}
-window.addEventListener("popstate", () => $("foglio").classList.remove("aperto"));
-$("chiudi-foglio").addEventListener("click", () => history.back());
-
-async function caricaScheda(id) {
+async function apriScheda(id) {
+  apriFoglio("Scheda", `<div class="vuoto">Carico la scheda…</div>`);
   const { data: x, error } = await sb.from("edizioni")
     .select("*, edizioni_speciali(*), osservazioni_prezzo(*)").eq("id", id).single();
   if (error || !x) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">Non riesco ad aprire la scheda.</div>`; return; }
   $("foglio-corpo").innerHTML = schedaCompleta(x);
 }
-
 function sezione(titolo, contenuto) { return contenuto ? `<h3 class="sezione">${esc(titolo)}</h3>${contenuto}` : ""; }
 function elenco(arr) { return (arr && arr.length) ? `<div class="riquadro"><ul class="elenco">${arr.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""; }
 
@@ -386,7 +516,6 @@ function schedaCompleta(x) {
     ["Traduttore", x.traduttore], ["ISBN", x.isbn], ["Prima edizione", x.prima_edizione === false ? "No" : "Sì"]]
     .filter(([, v]) => v !== null && v !== undefined && v !== "")
     .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
-
   const speciali = (x.edizioni_speciali || []).sort((a, b) => a.ordine - b.ordine).map(s => `
     <div class="speciale"><b>${esc(s.tipo || "Edizione speciale")}</b>
       ${s.tiratura ? `<div class="t-meta">${esc(s.tiratura)}</div>` : ""}
@@ -395,17 +524,15 @@ function schedaCompleta(x) {
       ${s.mercato ? `<p class="testo" style="margin-top:6px"><b style="font-family:var(--sans);font-size:14px">Mercato:</b> ${esc(s.mercato)}</p>` : ""}
       ${s.fonte ? `<div class="t-meta" style="margin-top:6px">Fonte: ${esc(s.fonte)}</div>` : ""}
     </div>`).join("");
-
   const oss = (x.osservazioni_prezzo || []).sort((a, b) => String(b.data_rilevazione || "").localeCompare(String(a.data_rilevazione || "")));
   const tabellaPrezzi = oss.length ? `<div class="riquadro"><table class="prezzi">${oss.map(o =>
     `<tr><td>${esc(o.fonte)}<div class="t-meta" style="margin:2px 0 0">${esc(o.data_rilevazione || "")}${o.con_autografo ? " · con autografo" : ""}</div></td><td class="n">${esc(Number(o.prezzo).toLocaleString("it-IT"))} €</td></tr>`).join("")}</table></div>` : "";
-
   const ricercaFoto = (x.foto_riferimento || "").replace(/^Ricerca immagini per:\s*/i, "") || `${x.autore} ${x.titolo} ${x.editore || ""} ${x.anno || ""}`;
+  const sbnLink = permalinkSbn(x.codice_sbn);
   const collegamenti = `<div class="collegamenti">
       <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ricercaFoto)}" target="_blank" rel="noopener">Foto di riferimento</a>
-      ${x.codice_sbn ? `<a href="https://opac.sbn.it/risultati-ricerca-avanzata/-/opac-adv/detail/${encodeURIComponent(x.codice_sbn)}" target="_blank" rel="noopener">OPAC SBN</a>` : ""}
+      ${sbnLink ? `<a href="${linkSicuro(sbnLink)}" target="_blank" rel="noopener">OPAC SBN</a>` : ""}
     </div>`;
-
   return `
     <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
     <span class="pill">${esc(macroGenere(x.genere))}</span>
@@ -429,34 +556,114 @@ function schedaCompleta(x) {
   `;
 }
 
-// ---------- Cerca: barcode ----------
-function pulisciSchermo() { $("risultati").innerHTML = ""; $("anteprima").hidden = true; $("stato").textContent = ""; }
+// ==================================================================
+// DETTAGLIO SBN (scheda completa + confronto con la copia + copie digitali)
+// ==================================================================
+let dettaglioCorrente = null;
+async function apriDettaglioSbn(codice, dalTaccuino) {
+  apriFoglio("Scheda SBN", `<div class="vuoto">Carico la scheda completa da SBN…</div>`);
+  let d;
+  try { d = await chiama({ azione: "dettaglio", bid: codice }); }
+  catch (e) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">${esc(e.message)}</div>`; return; }
+  const s = d.scheda;
+  if (!s || s.errore) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">${esc((s && s.errore) || "Scheda non disponibile")}</div>`; return; }
+  dettaglioCorrente = s;
+  const copie = Array.isArray(d.copie_digitali) ? d.copie_digitali : [];
+  const bib = s.biblioteche || [];
+  const mutili = bib.filter(b => /mutil|manca|lacun|incomplet/i.test(b.note || ""));
+  const controlli = [
+    ["Formato e numero di carte", s.descrizione_fisica,
+      "Conta le carte (i fogli, non le pagine) della tua copia e guarda il formato. «c.» = carte, «p.» = pagine; 2° folio, 4° quarto, 8° ottavo, 12° dodicesimo."],
+    ["Impronta", s.impronta,
+      "Codice ricavato da lettere stampate in punti fissi del libro, nato per distinguere edizioni che sembrano identiche. Se la tua copia dà un'impronta diversa, è un'altra edizione o un'altra emissione."],
+    ["Note del catalogatore", (s.note || []).join(" · "),
+      "Segnatura dei fascicoli (es. «A-D8» = 4 fascicoli da 8 carte), fregi, ritratti, carte bianche: confrontale con la tua copia. Una carta mancante rende l'esemplare mutilo."]
+  ].filter(c => c[1]);
+  $("foglio-corpo").innerHTML = `
+    ${s.codice_edit16 ? `<span class="pill edit16">EDIT16 · ${esc(s.codice_edit16)}</span>` : ""}
+    ${s.anno ? `<span class="pill">${esc(s.anno)}</span>` : ""}
+    <h1 class="copertina-titolo">${esc(s.titolo || "")}</h1>
+    <p class="copertina-autore">${esc(s.autore || "")}</p>
+    <div class="riquadro"><dl class="griglia">
+      ${s.pubblicazione ? `<dt>Pubblicazione</dt><dd>${esc(s.pubblicazione)}</dd>` : ""}
+      ${s.luogo ? `<dt>Luogo</dt><dd>${esc(s.luogo)}</dd>` : ""}
+      ${(s.nomi || []).length ? `<dt>Nomi</dt><dd>${s.nomi.map(esc).join("<br>")}</dd>` : ""}
+      ${s.lingua ? `<dt>Lingua</dt><dd>${esc(s.lingua)}</dd>` : ""}
+      <dt>Codice SBN</dt><dd>${esc(s.codice_sbn)}</dd>
+    </dl></div>
+    ${sezione("Confronta con la tua copia", controlli.length ? `<div class="riquadro">${controlli.map((c, i) => `
+      <div class="controllo"><div class="num">${i + 1}</div><div><b>${esc(c[0])}</b><span class="valore">${esc(c[1])}</span>
+      <p class="t-meta" style="margin:6px 0 0">${esc(c[2])}</p></div></div>`).join("")}</div>` : "")}
+    ${sezione("Copie digitalizzate", copie.errore ? `<p class="errore">${esc(copie.errore)}</p>` : copie.length ? `
+      <p class="intro" style="margin-left:0">Sfoglia una copia di biblioteca e confronta frontespizio, marca tipografica e colophon.</p>
+      <div class="copie">${copie.map(c => `<a href="${linkSicuro(c.scheda)}" target="_blank" rel="noopener">
+        ${c.anteprima ? `<img src="${linkSicuro(c.anteprima)}" alt="Anteprima della copia digitalizzata" loading="lazy">` : ""}
+        <span>Apri${c.teca ? " · " + esc(c.teca) : ""}</span></a>`).join("")}</div>` : `<p class="t-meta">Nessuna copia digitalizzata trovata su Internet Culturale.</p>`)}
+    ${sezione(`Biblioteche che la conservano (${bib.length})`, bib.length ? `
+      ${mutili.length ? `<p class="avviso">${mutili.length === 1 ? "Una copia di biblioteca è segnalata" : mutili.length + " copie di biblioteca sono segnalate"} come incompleta: guarda le note per sapere quali carte mancano più spesso.</p>` : ""}
+      <details><summary>Mostra l'elenco</summary>${bib.map(b => `<div class="riga"><div><b>${esc(b.biblioteca)}</b>${b.citta ? " · " + esc(b.citta) : ""}
+        ${b.note ? `<br><span class="t-meta">${esc(b.note)}</span>` : ""}${b.digitalizzazione ? `<br><span class="t-meta">${esc(b.digitalizzazione)}</span>` : ""}</div></div>`).join("")}</details>` : "")}
+    <div class="collegamenti" style="margin-top:14px">
+      ${s.permalink ? `<a href="${linkSicuro(s.permalink)}" target="_blank" rel="noopener">Apri in OPAC SBN</a>` : ""}
+      <a href="https://manus.iccu.sbn.it/risultati-ricerca-manoscritti/-/manus-search/search?search=${encodeURIComponent((s.autore || "").split(",")[0])}" target="_blank" rel="noopener">Manoscritti in Manus</a>
+    </div>
+    ${dalTaccuino ? "" : taccuino.some(v => v.codice_sbn === s.codice_sbn && v.stato !== "scartata") ? `<div class="riquadro salvato" style="margin-top:14px"><b>Questa edizione è già nel tuo Taccuino.</b></div>` : `
+    <h3 class="sezione">Ti interessa?</h3>
+    <div class="riquadro">
+      <p class="t-meta" style="margin-top:0">Salvala nel Taccuino: con il Comando 6 verifico prezzo e interesse di mercato. Puoi aggiungere una foto della tua copia.</p>
+      <input type="file" id="d-foto" accept="image/*" capture="environment" hidden>
+      <div class="riga-btn">
+        <button class="btn btn-tenue" id="d-aggiungi-foto" style="margin-top:0">Aggiungi foto</button>
+        <button class="btn btn-verde" id="d-salva">Salva nel Taccuino</button>
+      </div>
+      <p class="t-meta" id="d-foto-stato" style="margin:8px 0 0"></p>
+    </div>`}`;
+  if (!$("d-salva")) return;
+  let fotoDettaglio = null;
+  $("d-aggiungi-foto").onclick = () => $("d-foto").click();
+  $("d-foto").onchange = async () => {
+    const f = $("d-foto").files && $("d-foto").files[0];
+    if (!f) return;
+    try { fotoDettaglio = await preparaFoto(f); $("d-foto-stato").textContent = "Foto pronta."; }
+    catch (_) { $("d-foto-stato").textContent = "Non riesco ad aprire la foto."; }
+  };
+  $("d-salva").onclick = async () => {
+    $("d-salva").disabled = true;
+    const ok = await salvaNelTaccuino({
+      origine: ultimaRichiesta && ultimaRichiesta.azione === "antico" ? "antico" : "testo",
+      testo: [s.autore, s.titolo].filter(Boolean).join(" — ").slice(0, 300),
+      campi: ultimaRichiesta && ultimaRichiesta.azione === "antico" ? ultimaRichiesta : null,
+      codice_sbn: s.codice_sbn,
+      riepilogo: { sbn_scelta: { codice_sbn: s.codice_sbn, titolo: s.titolo, autore: s.autore, pubblicazione: s.pubblicazione, anno: s.anno, descrizione_fisica: s.descrizione_fisica, impronta: s.impronta, edit16: s.codice_edit16 }, copie_digitali: copie.length || 0 }
+    }, fotoDettaglio);
+    $("d-salva").disabled = false;
+    if (ok) history.back();
+  };
+}
+
+// ==================================================================
+// CERCA: barcode, foto, testo
+// ==================================================================
+function pulisciSchermo() { $("risultati").innerHTML = ""; $("stato").textContent = ""; }
 function bloccaPulsanti(si) { $("scansiona").disabled = si; $("fotografa").disabled = si; }
 
 $("scansiona").addEventListener("click", async () => {
-  pulisciSchermo();
+  pulisciSchermo(); chiudiPannelloFoto();
   $("lettore").hidden = false; $("annulla").hidden = false;
   bloccaPulsanti(true);
   $("stato").textContent = "Inquadra il codice a barre sul retro (quello che inizia con 978).";
   lettore = new Html5Qrcode("lettore", {
     formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
-    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-    verbose: false
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true }, verbose: false
   });
   try {
-    await lettore.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: (w) => ({ width: Math.min(w * 0.9, 340), height: 130 }) },
+    await lettore.start({ facingMode: "environment" }, { fps: 10, qrbox: (w) => ({ width: Math.min(w * 0.9, 340), height: 130 }) },
       async (codice) => {
-        if (!/^97[89]\d{10}$/.test(codice)) {
-          $("stato").textContent = "Questo non è un ISBN (forse è il codice del prezzo): inquadra quello che inizia con 978.";
-          return;
-        }
+        if (!/^97[89]\d{10}$/.test(codice)) { $("stato").textContent = "Questo non è un ISBN (forse è il codice del prezzo): inquadra quello che inizia con 978."; return; }
         await fermaScansione();
         $("campo").value = codice;
-        cerca({ isbn: codice }, "Cerco l'ISBN " + codice + "…");
-      }
-    );
+        cerca({ isbn: codice }, "Cerco l'ISBN " + codice + "…", { origine: "barcode", automatico: true });
+      });
   } catch (err) {
     await fermaScansione();
     $("stato").innerHTML = '<span class="errore">Non riesco ad aprire la fotocamera: controlla di aver dato il permesso al browser.</span>';
@@ -464,86 +671,91 @@ $("scansiona").addEventListener("click", async () => {
 });
 async function fermaScansione() {
   if (lettore) { try { await lettore.stop(); lettore.clear(); } catch (_) {} lettore = null; }
-  $("lettore").hidden = true; $("annulla").hidden = true;
-  bloccaPulsanti(false);
+  $("lettore").hidden = true; $("annulla").hidden = true; bloccaPulsanti(false);
 }
 $("annulla").addEventListener("click", () => { fermaScansione(); $("stato").textContent = ""; });
 
-// ---------- Cerca: foto (Tesseract sul telefono) ----------
-async function ottieniWorker() {
-  if (!workerOcr) {
-    $("stato").textContent = "Preparo il lettore di testo (solo la prima volta, qualche secondo)…";
-    workerOcr = await Tesseract.createWorker("ita+eng", 1, {
-      logger: (m) => { if (m.status === "recognizing text") $("stato").textContent = "Leggo la copertina… " + Math.round(m.progress * 100) + "%"; }
-    });
-    await workerOcr.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT });
-  }
-  return workerOcr;
-}
-function righeDaOcr(data) {
-  const righe = [];
-  for (const b of (data.blocks || [])) for (const p of (b.paragraphs || [])) for (const l of (p.lines || [])) {
-    const parole = (l.words || []).filter(w => w.confidence >= 55 && /\p{L}{2,}/u.test(w.text));
-    if (!parole.length) continue;
-    const testo = parole.map(w => w.text.replace(/[^\p{L}\p{N}'’-]/gu, "")).filter(Boolean).join(" ");
-    if ((testo.match(/\p{L}/gu) || []).length < 3) continue;
-    const altezza = parole.reduce((s, w) => s + (w.bbox.y1 - w.bbox.y0), 0) / parole.length;
-    righe.push({ testo, altezza });
-  }
-  righe.sort((a, b) => b.altezza - a.altezza);
-  return righe.slice(0, 5).map(r => r.testo).join("\n") || (data.text || "");
-}
+// Foto: niente lettura automatica del testo. La foto accompagna la ricerca e si salva nel Taccuino.
 $("fotografa").addEventListener("click", () => { $("file-foto").value = ""; $("file-foto").click(); });
 $("file-foto").addEventListener("change", async () => {
   const file = $("file-foto").files && $("file-foto").files[0];
   if (!file) return;
   pulisciSchermo();
-  bloccaPulsanti(true);
   try {
-    $("stato").textContent = "Preparo la foto…";
-    const tela = await preparaFoto(file, 1800);
-    $("anteprima").src = tela.toDataURL("image/jpeg", 0.8);
-    $("anteprima").hidden = false;
-    const w = await ottieniWorker();
-    const { data } = await w.recognize(tela, {}, { text: true, blocks: true });
-    await cerca({ testo_ocr: righeDaOcr(data) }, "Cerco…");
-  } catch (_) {
-    $("stato").innerHTML = '<span class="errore">Non riesco a leggere la foto. Riprova con più luce.</span>';
-  } finally {
-    bloccaPulsanti(false);
-  }
+    fotoCorrente = await preparaFoto(file);
+    $("anteprima").src = URL.createObjectURL(fotoCorrente.grande);
+    $("testo-foto").value = "";
+    $("pannello-foto").hidden = false;
+    $("testo-foto").focus();
+  } catch (_) { $("stato").innerHTML = '<span class="errore">Non riesco ad aprire la foto.</span>'; }
 });
-function preparaFoto(file, lato) {
+function chiudiPannelloFoto() { $("pannello-foto").hidden = true; fotoCorrente = null; }
+$("foto-annulla").addEventListener("click", () => { chiudiPannelloFoto(); pulisciSchermo(); });
+$("foto-salva").addEventListener("click", async () => {
+  const t = $("testo-foto").value.trim();
+  const ok = await salvaNelTaccuino({ origine: "foto", testo: t || null }, fotoCorrente);
+  if (ok) { chiudiPannelloFoto(); pulisciSchermo(); }
+});
+$("foto-cerca").addEventListener("click", () => {
+  const t = $("testo-foto").value.trim();
+  if (!t) { avvisa("Scrivi autore e titolo per cercare, oppure salva solo la foto nel Taccuino."); return; }
+  const foto = fotoCorrente;
+  $("pannello-foto").hidden = true;
+  cerca({ testo: t }, "Cerco…", { origine: "foto", automatico: true, foto });
+});
+
+// Riduce la foto: una versione per l'archivio e una miniatura leggera per la consultazione
+function preparaFoto(file) {
   return new Promise((ok, ko) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      const s = Math.min(1, lato / Math.max(img.width, img.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-      const ctx = c.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(img, 0, 0, c.width, c.height);
-      const d = ctx.getImageData(0, 0, c.width, c.height), p = d.data;
-      for (let i = 0; i < p.length; i += 4) {
-        let g = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2];
-        g = Math.max(0, Math.min(255, (g - 128) * 1.2 + 128));
-        p[i] = p[i + 1] = p[i + 2] = g;
-      }
-      ctx.putImageData(d, 0, 0);
-      URL.revokeObjectURL(url);
-      ok(c);
+      const disegna = (lato, qualita) => {
+        const s = Math.min(1, lato / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        return { c, qualita };
+      };
+      const g = disegna(1400, 0.8), p = disegna(360, 0.6);
+      const anteprima = p.c.toDataURL("image/jpeg", p.qualita).split(",")[1];
+      g.c.toBlob((blob) => { URL.revokeObjectURL(url); blob ? ok({ grande: blob, anteprima }) : ko(); }, "image/jpeg", g.qualita);
     };
     img.onerror = () => { URL.revokeObjectURL(url); ko(); };
     img.src = url;
   });
 }
 
-// ---------- Google Books (dal telefono) ----------
+$("form-cerca").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const v = $("campo").value.trim();
+  if (!v) return;
+  pulisciSchermo(); chiudiPannelloFoto();
+  const cifre = v.replace(/[-\s]/g, "");
+  if (/^(\d{9}[\dXx]|\d{13})$/.test(cifre)) cerca({ isbn: cifre }, "Cerco l'ISBN…", { origine: "barcode", automatico: false });
+  else cerca({ testo: v }, "Cerco…", { origine: "testo", automatico: false });
+});
+
+async function cerca(corpo, messaggio, contesto) {
+  ultimaRichiesta = corpo;
+  $("risultati").innerHTML = "";
+  $("stato").textContent = messaggio || "Cerco…";
+  let data;
+  try { data = await chiama(corpo); }
+  catch (e) { $("stato").innerHTML = '<span class="errore">' + esc(e.message) + '</span>'; return; }
+  if (data.google_books_da_telefono && data.chiave_google_books) {
+    try { data.google_books = await googleBooksDalTelefono(data.chiave_google_books); }
+    catch (e) { data.google_books = { errore: "Google Books non raggiungibile (" + e.message + ")" }; }
+  }
+  $("stato").textContent = "";
+  mostraRisultati(data, contesto || {});
+}
+
 async function googleBooksDalTelefono(q) {
   const u = new URL("https://www.googleapis.com/books/v1/volumes");
   u.searchParams.set("q", q); u.searchParams.set("maxResults", "8"); u.searchParams.set("printType", "books");
   const r = await fetch(u);
-  if (!r.ok) throw new Error("Google Books ha risposto " + r.status);
+  if (!r.ok) throw new Error("risposta " + r.status);
   const d = await r.json();
   return {
     avviso: "Google Books mescola edizioni e ristampe: utile per titolo e copertina, non per stabilire la prima edizione.",
@@ -558,75 +770,52 @@ async function googleBooksDalTelefono(q) {
   };
 }
 
-// ---------- Cerca: testo e chiamata al server ----------
-$("form-cerca").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const v = $("campo").value.trim();
-  if (!v) return;
-  pulisciSchermo();
-  const cifre = v.replace(/[-\s]/g, "");
-  if (/^(\d{9}[\dXx]|\d{13})$/.test(cifre)) cerca({ isbn: cifre }, "Cerco l'ISBN…");
-  else cerca({ testo: v }, "Cerco…");
-});
+function edizioneSbn(r, etichetta, oro) {
+  const anno = r.anno || ((String(r.pubblicazione || "").match(/\b(1[4-9]\d{2}|20\d{2})\b/) || [])[1]) || "s.d.";
+  return `<button class="ed ${oro ? "oro" : ""}" data-sbn="${esc(r.codice_sbn)}">
+    <div class="anno">${esc(anno)}</div>
+    <div class="corpo">
+      ${etichetta ? `<div class="etichetta">${esc(etichetta)}</div>` : ""}
+      <div class="tit">${esc(r.titolo)}</div>
+      <div class="pub">${esc(r.pubblicazione || "")}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</div>
+      ${r.codice_edit16 ? `<span class="pill edit16" style="margin-top:6px">EDIT16 · ${esc(r.codice_edit16)}</span>` : ""}
+    </div>
+  </button>`;
+}
+function cartolineCatalogo(lista) { return lista.map(x => cartolina({ ...x, macro: macroGenere(x.genere), prezzo: prezzoBreve(x.mercato) })).join(""); }
 
-async function cerca(corpo, messaggio) {
-  ultimaRichiesta = corpo;
-  $("risultati").innerHTML = "";
-  $("stato").textContent = messaggio || "Cerco…";
-  const { data, error } = await sb.functions.invoke("cerca", { body: corpo });
-  if (error) {
-    const stato = error.context && error.context.status;
-    if (stato === 401) { await sb.auth.signOut(); mostraSchermata(); return; }
-    let dettaglio = "Errore nella ricerca. Riprova tra poco.";
-    try { const j = await error.context.json(); if (j && j.errore) dettaglio = j.errore; } catch (_) {}
-    $("stato").innerHTML = '<span class="errore">' + esc(dettaglio) + '</span>';
-    return;
-  }
-  if (data.google_books_da_telefono && data.chiave_google_books) {
-    try { data.google_books = await googleBooksDalTelefono(data.chiave_google_books); }
-    catch (e) { data.google_books = { errore: "Google Books non raggiungibile: " + e.message }; }
-  }
-  $("stato").textContent = "";
-  mostraRisultati(data);
+function riepilogoRicerca(d) {
+  const s = d.sbn && !d.sbn.errore ? d.sbn : null;
+  const breve = (r) => r ? { codice_sbn: r.codice_sbn, titolo: r.titolo, autore: r.autore, pubblicazione: r.pubblicazione, anno: r.anno } : null;
+  return {
+    sbn_in_mano: s ? breve(s.edizione_in_mano) : null,
+    sbn_candidata: s ? breve(s.candidata_prima_edizione) : null,
+    sbn_totale: s ? s.totale_in_sbn : null,
+    google_books: d.google_books && d.google_books.risultati ? d.google_books.risultati.slice(0, 3).map(g => ({ titolo: g.titolo, autori: g.autori, editore: g.editore, data: g.data, isbn: g.isbn })) : null
+  };
 }
 
-function schedaSbn(r, etichetta, oro) {
-  return `<div class="riquadro ${oro ? "oro" : ""}">
-    <p class="etichetta">${esc(etichetta)}</p>
-    <p class="t-serif">${esc(r.titolo)}</p>
-    <p class="t-autore">${esc(r.autore || "")}</p>
-    <p class="t-meta">${esc(r.pubblicazione || "")}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</p>
-    <a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">Apri in OPAC SBN</a>
-  </div>`;
-}
-function cartolineCatalogo(lista) {
-  return lista.map(x => cartolina({ ...x, macro: macroGenere(x.genere), prezzo: prezzoBreve(x.mercato) })).join("");
-}
-
-function mostraRisultati(d) {
+async function mostraRisultati(d, contesto) {
   let h = "";
-  if (d.testo_letto !== null && d.testo_letto !== undefined) {
-    h += `<div class="riquadro"><p class="etichetta">Testo letto dalla foto · correggilo se serve</p>
-      <textarea id="testo-letto" rows="3">${esc(d.chiave_usata || d.testo_letto)}</textarea>
-      <button class="btn btn-tenue" id="ricerca-letto">Cerca con questo testo</button></div>`;
-  }
   if (d.errore) h += `<p class="errore">${esc(d.errore)}</p>`;
-
   const forti = (d.catalogo || []).filter(x => x.punteggio >= SOGLIA);
   const deboli = (d.catalogo || []).filter(x => x.punteggio < SOGLIA);
+  const stessoTitolo = d.stesso_titolo_nel_catalogo || [];
+  const nelCatalogo = forti.length > 0 || stessoTitolo.length > 0;
+
+  h += `<div id="esito-taccuino"></div>`;
   if (forti.length) h += `<h3 class="sezione">Nel tuo catalogo</h3>` + cartolineCatalogo(forti);
-  if ((d.stesso_titolo_nel_catalogo || []).length) h += `<h3 class="sezione">Questo titolo è nel tuo catalogo</h3>` + cartolineCatalogo(d.stesso_titolo_nel_catalogo);
+  if (stessoTitolo.length) h += `<h3 class="sezione">Questo titolo è nel tuo catalogo</h3>` + cartolineCatalogo(stessoTitolo);
 
   const s = d.sbn;
   if (s && s.errore) h += `<h3 class="sezione">OPAC SBN</h3><p class="errore">${esc(s.errore)}</p>`;
   else if (s) {
     h += `<h3 class="sezione">OPAC SBN</h3>`;
-    if (s.edizione_in_mano) h += schedaSbn(s.edizione_in_mano, "Edizione che hai in mano", false);
-    if (s.candidata_prima_edizione) { h += schedaSbn(s.candidata_prima_edizione, "Candidata prima edizione", true); h += `<p class="avviso">${esc(s.avviso)}</p>`; }
+    if (s.edizione_in_mano) h += edizioneSbn(s.edizione_in_mano, "Edizione che hai in mano", false);
+    if (s.candidata_prima_edizione) { h += edizioneSbn(s.candidata_prima_edizione, "Candidata prima edizione", true); h += `<p class="avviso">${esc(s.avviso)}</p>`; }
     if ((s.risultati || []).length) {
-      const nota = s.elenco_completo ? "" : ` · mostrate ${s.risultati.length} su ${s.totale_in_sbn}`;
-      h += `<details><summary>Tutte le edizioni in SBN (${esc(s.totale_in_sbn)})${esc(nota)}</summary>` +
-        s.risultati.map(r => `<div class="riga"><div><b>${esc(r.anno || "s.d.")}</b> — ${esc(r.titolo)}<br><span class="t-meta">${esc(r.pubblicazione || "")}</span> · <a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">SBN</a></div></div>`).join("") + `</details>`;
+      const nota = s.elenco_completo ? "" : ` · prime ${s.risultati.length} di ${s.totale_in_sbn}`;
+      h += `<details><summary>Tutte le edizioni in SBN (${esc(s.totale_in_sbn)})${esc(nota)}</summary>${s.risultati.map(r => edizioneSbn(r, "", false)).join("")}</details>`;
     }
     if (!s.edizione_in_mano && !(s.risultati || []).length) h += `<p class="vuoto">Nessun risultato in SBN.</p>`;
   }
@@ -643,16 +832,232 @@ function mostraRisultati(d) {
 
   if (!forti.length && deboli.length) h += `<h3 class="sezione">Forse cercavi</h3>` + cartolineCatalogo(deboli);
   if (forti.length && !s) h += `<button class="btn btn-tenue" id="anche-fuori">Cerca anche in SBN e Google Books</button>`;
-  if (!h) h = `<p class="vuoto">Nessun risultato.</p>`;
-
   $("risultati").innerHTML = h;
-  const b = $("anche-fuori");
-  if (b) b.addEventListener("click", () => cerca({ ...ultimaRichiesta, forza_sbn: true }, "Cerco anche fuori dal catalogo…"));
-  const r = $("ricerca-letto");
-  if (r) r.addEventListener("click", () => { const t = $("testo-letto").value.trim(); if (t) { pulisciSchermo(); cerca({ testo: t }, "Cerco…"); } });
-}
-$("risultati").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) apriScheda(b.dataset.id); });
 
+  const b = $("anche-fuori");
+  if (b) b.addEventListener("click", () => cerca({ ...ultimaRichiesta, forza_sbn: true }, "Cerco anche fuori dal catalogo…", { ...contesto, automatico: false }));
+
+  // Taccuino: barcode e foto non presenti nel catalogo si salvano da soli; il testo solo su richiesta
+  if (!nelCatalogo) {
+    const voce = {
+      origine: contesto.origine || "testo",
+      isbn: ultimaRichiesta.isbn || null,
+      testo: ultimaRichiesta.testo || null,
+      codice_sbn: s && !s.errore && s.edizione_in_mano ? s.edizione_in_mano.codice_sbn : null,
+      riepilogo: riepilogoRicerca(d)
+    };
+    if (contesto.automatico) {
+      const id = await salvaNelTaccuino(voce, contesto.foto, true);
+      if (id) $("esito-taccuino").innerHTML = `<div class="riquadro salvato"><b>Non è nel tuo catalogo: salvato nel Taccuino.</b>
+        <p class="t-meta" style="margin:4px 0 0">Lo studio con il Comando 6. Nulla entra nel catalogo senza la tua approvazione.</p>
+        <div class="riga-btn"><button class="btn btn-tenue" style="margin-top:0" id="annulla-salvataggio">Non salvarlo</button></div></div>`;
+      const a = $("annulla-salvataggio");
+      if (a) a.onclick = async () => { await eliminaVoce(id); $("esito-taccuino").innerHTML = ""; avvisa("Tolto dal Taccuino."); };
+    } else {
+      $("esito-taccuino").innerHTML = `<div class="riquadro"><b>Non è nel tuo catalogo.</b>
+        <div class="riga-btn"><button class="btn btn-verde" id="salva-manuale">Salva nel Taccuino</button></div></div>`;
+      $("salva-manuale").onclick = async () => { const id = await salvaNelTaccuino(voce, null); if (id) $("esito-taccuino").innerHTML = `<div class="riquadro salvato"><b>Salvato nel Taccuino.</b></div>`; };
+    }
+  }
+}
+
+// ==================================================================
+// LIBRO ANTICO
+// ==================================================================
+$("form-antico").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const corpo = {
+    azione: "antico",
+    autore: $("a-autore").value.trim(), titolo: $("a-titolo").value.trim(), altro: $("a-altro").value.trim(),
+    luogo: $("a-luogo").value.trim(), anno_da: $("a-da").value.trim(), anno_a: $("a-a").value.trim()
+  };
+  if (!corpo.autore && !corpo.titolo && !corpo.altro) { $("a-stato").innerHTML = '<span class="errore">Scrivi almeno autore, titolo o una parola del frontespizio.</span>'; return; }
+  ultimaRichiesta = corpo;
+  $("a-risultati").innerHTML = "";
+  $("a-stato").textContent = "Cerco nel fondo antico di SBN…";
+  let d;
+  try { d = await chiama(corpo); }
+  catch (err) { $("a-stato").innerHTML = '<span class="errore">' + esc(err.message) + '</span>'; return; }
+  $("a-stato").textContent = "";
+  let h = "";
+  if ((d.catalogo || []).length) h += `<h3 class="sezione">Nel tuo catalogo</h3>` + cartolineCatalogo(d.catalogo);
+  const s = d.sbn;
+  if (!s || s.errore) h += `<p class="errore">${esc((s && s.errore) || "SBN non risponde")}</p>`;
+  else {
+    h += `<h3 class="sezione">Edizioni in SBN (${s.risultati.length})</h3>`;
+    if (s.avviso) h += `<p class="avviso">${esc(s.avviso)}</p>`;
+    h += s.risultati.length
+      ? `<p class="intro" style="margin:0 2px 10px">Tocca un'edizione per la scheda completa e il confronto con la tua copia.</p>` + s.risultati.map((r, i) => edizioneSbn(r, i === 0 ? "La più antica trovata" : "", i === 0)).join("")
+      : `<div class="vuoto">Nessuna edizione corrisponde. Prova a togliere il luogo o ad allargare gli anni: sui frontespizi antichi i nomi cambiano grafia.</div>`;
+  }
+  $("a-risultati").innerHTML = h;
+});
+
+// ==================================================================
+// TACCUINO
+// ==================================================================
+async function salvaNelTaccuino(voce, foto, silenzioso) {
+  if (!utente) return null;
+  let foto_path = null;
+  try {
+    if (foto && foto.grande) {
+      foto_path = `${utente.id}/${Date.now()}.jpg`;
+      const { error: eFoto } = await sb.storage.from("taccuino").upload(foto_path, foto.grande, { contentType: "image/jpeg", upsert: false });
+      if (eFoto) { foto_path = null; avvisa("La foto non è stata caricata, salvo comunque il libro."); }
+    }
+    const riga = {
+      origine: voce.origine, isbn: voce.isbn || null, testo: voce.testo || null, campi: voce.campi || null,
+      codice_sbn: voce.codice_sbn || null, riepilogo: voce.riepilogo || null, foto_path,
+      anteprima: foto && foto.anteprima ? foto.anteprima : null, nota: voce.nota || null
+    };
+    const { data, error } = await sb.from("taccuino").insert(riga).select("id").single();
+    if (error) throw error;
+    if (!silenzioso) avvisa("Salvato nel Taccuino.");
+    caricaTaccuino();
+    return data.id;
+  } catch (e) {
+    avvisa("Non sono riuscito a salvare nel Taccuino. Riprova.");
+    return null;
+  }
+}
+async function eliminaVoce(id) {
+  const { data } = await sb.from("taccuino").select("foto_path").eq("id", id).single();
+  const { error } = await sb.from("taccuino").delete().eq("id", id);
+  if (!error && data && data.foto_path) await sb.storage.from("taccuino").remove([data.foto_path]);
+  caricaTaccuino();
+  return !error;
+}
+
+async function caricaTaccuino() {
+  if (!utente) return;
+  const { data, error } = await sb.from("taccuino")
+    .select("id, creato_il, origine, isbn, testo, campi, codice_sbn, riepilogo, foto_path, anteprima, nota, stato, esito, motivo, proposta, edizione_id")
+    .order("creato_il", { ascending: false }).limit(300);
+  if (error) { $("t-elenco").innerHTML = `<div class="vuoto errore">Non riesco a caricare il Taccuino.</div>`; return; }
+  taccuino = data;
+  const proposte = taccuino.filter(x => x.stato === "proposta").length;
+  $("bollino").hidden = !proposte; $("bollino").textContent = proposte;
+  disegnaTaccuino();
+}
+const FILTRI_T = [["attivi", "Da fare"], ["proposta", "Proposte"], ["approvata", "Nel catalogo"], ["scartata", "Scartate"]];
+function disegnaTaccuino() {
+  const conta = (f) => taccuino.filter(x => f === "attivi" ? (x.stato === "da_valutare" || x.stato === "in_ricerca") : x.stato === f).length;
+  $("t-filtri").innerHTML = FILTRI_T.map(([k, n]) => `<button class="chip ${filtroT === k ? "attivo" : ""}" data-filtro-t="${k}">${n}<i>${conta(k)}</i></button>`).join("");
+  const righe = taccuino.filter(x => filtroT === "attivi" ? (x.stato === "da_valutare" || x.stato === "in_ricerca") : x.stato === filtroT);
+  const vuoti = { attivi: "Niente in coda. I libri che scansioni o fotografi e che non sono nel catalogo arrivano qui.",
+    proposta: "Nessuna proposta da decidere. Scrivi «lavora il Taccuino» in chat per avviare il Comando 6.",
+    approvata: "Nessun libro approvato finora.", scartata: "Nessun libro scartato." };
+  $("t-elenco").innerHTML = righe.length ? righe.map(voceTaccuino).join("") : `<div class="vuoto">${vuoti[filtroT]}</div>`;
+}
+$("t-filtri").addEventListener("click", (e) => { const b = e.target.closest("[data-filtro-t]"); if (!b) return; filtroT = b.dataset.filtroT; disegnaTaccuino(); });
+
+function titoloVoce(v) {
+  const p = v.proposta && v.proposta.edizione;
+  if (p && p.titolo) return `${p.titolo} — ${p.autore || ""}`;
+  const r = v.riepilogo || {};
+  const sbn = r.sbn_scelta || r.sbn_in_mano;
+  if (sbn && sbn.titolo) return sbn.titolo.split(" / ")[0];
+  if (v.testo) return v.testo;
+  if (v.isbn) return "ISBN " + v.isbn;
+  return "Libro fotografato";
+}
+const ICONA_FOTO = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5zM20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/></svg>`;
+const ORIGINI = { barcode: "Barcode", foto: "Foto", testo: "Ricerca", antico: "Libro antico" };
+
+function voceTaccuino(v) {
+  const r = v.riepilogo || {};
+  const sbn = r.sbn_scelta || r.sbn_in_mano || r.sbn_candidata;
+  const p = v.proposta && v.proposta.edizione;
+  let corpo = "";
+  if (v.stato === "proposta" || v.stato === "approvata" || (v.stato === "scartata" && v.esito)) {
+    corpo += `<div class="esito esito-${esc(v.esito || "")}"><b>${esc(ESITI[v.esito] || "Esito")}</b>${v.motivo ? `<br>${esc(v.motivo)}` : ""}</div>`;
+    const copia = v.proposta && v.proposta.copia;
+    if (copia) corpo += `<div class="riquadro" style="box-shadow:none;border:1px solid var(--linea)">
+      <div class="etichetta">La tua copia</div>
+      ${copia.edizione ? `<p class="testo"><b>${esc(copia.edizione)}</b></p>` : ""}
+      ${copia.valutazione ? `<p class="testo" style="margin-top:4px">${esc(copia.valutazione)}</p>` : ""}
+    </div>`;
+    if (p) {
+      const pr = prezzoBreve(p.mercato);
+      corpo += `<div class="riquadro oro" style="box-shadow:none">
+        <div class="etichetta">Scheda proposta</div>
+        <p class="t-serif">${esc(p.titolo)}</p><p class="t-autore">${esc(p.autore || "")}</p>
+        <p class="t-meta">${esc([p.editore, p.anno].filter(Boolean).join(" · "))}</p>
+        <div class="libro-piede">${pr ? `<span class="pill prezzo">${esc(pr)}</span>` : ""}${p.stato_verifica ? `<span class="pill stato-${esc(p.stato_verifica)}">${esc(ETICHETTE[p.stato_verifica] || "")}</span>` : ""}</div>
+        ${p.mercato ? `<p class="testo" style="margin-top:8px">${esc(p.mercato)}</p>` : ""}
+        ${(p.trappole || []).length ? `<details><summary>Trappole (${p.trappole.length})</summary>${p.trappole.map(t => `<div class="trappola">${esc(t)}</div>`).join("")}</details>` : ""}
+        ${p.affidabilita ? `<p class="t-meta" style="margin-top:8px">${esc(p.affidabilita)}</p>` : ""}
+      </div>`;
+    }
+  }
+  if (sbn && sbn.codice_sbn) corpo += edizioneSbn({ ...sbn, codice_edit16: sbn.edit16 || null }, "Edizione SBN collegata", false);
+  if (v.nota) corpo += `<p class="testo" style="margin:8px 0"><b>Nota:</b> ${esc(v.nota)}</p>`;
+
+  let azioni = "";
+  if (v.stato === "proposta" && (v.esito === "merita" || v.esito === "senza_prezzo")) {
+    azioni += (v.esito === "senza_prezzo" ? `<p class="avviso">Nessun prezzo reale trovato: se approvi, la scheda entra come «Stima AI».</p>` : "") +
+      `<div class="riga-btn"><button class="btn btn-verde" data-approva="${v.id}">Approva e aggiungi</button><button class="btn btn-rosso" data-scarta="${v.id}">Scarta</button></div>`;
+  } else if (v.stato === "proposta") {
+    azioni += `<div class="riga-btn"><button class="btn btn-verde" data-scarta="${v.id}">Ok, scarta</button><button class="btn btn-tenue" style="margin-top:0" data-riapri="${v.id}">Rimetti in coda</button></div>`;
+  } else if (v.stato === "approvata" && v.edizione_id) {
+    azioni += `<div class="riga-btn"><button class="btn btn-verde" data-scheda="${esc(v.edizione_id)}">Apri la scheda</button></div>`;
+  } else if (v.stato === "scartata") {
+    azioni += `<div class="riga-btn"><button class="btn btn-tenue" style="margin-top:0" data-riapri="${v.id}">Rimetti in coda</button><button class="btn btn-rosso" data-elimina="${v.id}">Elimina</button></div>`;
+  }
+  if (v.stato !== "approvata") {
+    azioni += `<details><summary>${v.nota ? "Modifica la nota" : "Aggiungi una nota"}</summary>
+      <textarea rows="2" id="nota-${v.id}" placeholder="es. visto a 15 € al mercatino">${esc(v.nota || "")}</textarea>
+      <div class="riga-btn"><button class="btn btn-tenue" style="margin-top:0" data-salva-nota="${v.id}">Salva nota</button>
+      ${v.stato === "da_valutare" ? `<button class="btn btn-rosso" data-elimina="${v.id}">Elimina</button>` : ""}</div></details>`;
+  }
+  const foto = v.anteprima ? `<img src="data:image/jpeg;base64,${esc(v.anteprima)}" alt="Foto del libro" data-foto="${esc(v.foto_path || "")}">` : `<div class="senza-foto">${ICONA_FOTO}</div>`;
+  return `<div class="voce">
+    <div class="voce-testa">${foto}
+      <div class="voce-corpo">
+        <div class="voce-titolo">${esc(titoloVoce(v))}</div>
+        <div class="t-meta">${esc(ORIGINI[v.origine] || "")} · ${esc(dataBreve(v.creato_il))}${v.isbn ? " · " + esc(v.isbn) : ""}</div>
+        <span class="st st-${esc(v.stato)}">${esc(STATI_T[v.stato] || v.stato)}</span>
+      </div>
+    </div>
+    <div class="voce-dett">${corpo}${azioni}</div>
+  </div>`;
+}
+
+$("t-elenco").addEventListener("click", async (e) => {
+  const t = e.target.closest("button, img");
+  if (!t) return;
+  if (t.dataset.foto) {
+    const { data } = await sb.storage.from("taccuino").createSignedUrl(t.dataset.foto, 300);
+    if (data && data.signedUrl) apriFoglio("Foto", `<img src="${linkSicuro(data.signedUrl)}" alt="Foto del libro" style="width:100%;border-radius:12px">`);
+    return;
+  }
+  const id = Number(t.dataset.approva || t.dataset.scarta || t.dataset.riapri || t.dataset.elimina || t.dataset.salvaNota);
+  if (!id) return;
+  t.disabled = true;
+  if (t.dataset.approva) {
+    const { data, error } = await sb.rpc("approva_proposta", { p_id: id });
+    if (error) { avvisa("Approvazione non riuscita: " + error.message); t.disabled = false; return; }
+    avvisa("Aggiunto al catalogo.", () => apriScheda(data), "Apri");
+    caricato = false; caricaCatalogo();
+  } else if (t.dataset.scarta) {
+    const { error } = await sb.from("taccuino").update({ stato: "scartata" }).eq("id", id);
+    avvisa(error ? "Operazione non riuscita." : "Scartato.");
+  } else if (t.dataset.riapri) {
+    const { error } = await sb.from("taccuino").update({ stato: "da_valutare" }).eq("id", id);
+    avvisa(error ? "Operazione non riuscita." : "Rimesso in coda.");
+  } else if (t.dataset.elimina) {
+    const ok = await eliminaVoce(id);
+    avvisa(ok ? "Eliminato." : "Operazione non riuscita.");
+    return;
+  } else if (t.dataset.salvaNota) {
+    const testo = ($("nota-" + id).value || "").trim().slice(0, 1000);
+    const { error } = await sb.from("taccuino").update({ nota: testo || null }).eq("id", id);
+    avvisa(error ? "Nota non salvata." : "Nota salvata.");
+  }
+  caricaTaccuino();
+});
+
+sb.auth.onAuthStateChange((evento) => { if (evento === "SIGNED_OUT") mostraSchermata(); });
 mostraSchermata();
 </script>
 </body>
