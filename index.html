@@ -175,6 +175,7 @@
   .griglia { display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:14px; }
   .griglia dt { color:var(--grigio); }
   .griglia dd { margin:0; }
+  .griglia dd.codice { font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--grigio, #6b5e4e); user-select:all; word-break:break-all; }
   .testo { font-size:14.5px; line-height:1.6; margin:0; }
   ul.elenco { margin:0; padding-left:18px; font-size:14.5px; line-height:1.55; }
   ul.elenco li { margin-bottom:6px; }
@@ -196,6 +197,50 @@
   .copie a { display:block; background:var(--bianco); border-radius:12px; overflow:hidden; box-shadow:var(--ombra); text-decoration:none; color:var(--verde); font-size:13px; font-weight:600; }
   .copie img { width:100%; height:150px; object-fit:cover; display:block; background:var(--salvia); }
   .copie span { display:block; padding:8px 10px; }
+
+  /* Affidabilità calcolata */
+  .pill.aff-piu { background:var(--verde); color:#fff; }
+  .pill.aff-singola { background:#6d5641; color:#fff; }
+  .pill.aff-autografo, .pill.aff-speciali { background:#8a6d50; color:#fff; }
+  .pill.aff-ritrovare { background:var(--bordeaux-chiaro); color:var(--bordeaux); }
+  .pill.aff-stima { background:#77736a; color:#fff; }
+  .pill.vecchia { background:var(--bordeaux); color:#fff; }
+  .pill.mia { background:var(--melanzana); color:#fff; }
+  .pill.prezzo.incerto { background:transparent; border:1px dashed var(--ottone); color:var(--grigio); font-weight:500; }
+  .s-aff-piu .nastro { background:var(--verde); }
+  .s-aff-singola .nastro { background:#8a6d50; }
+  .s-aff-autografo .nastro, .s-aff-speciali .nastro { background:#b39472; }
+  .s-aff-ritrovare .nastro { background:var(--bordeaux); }
+  .s-aff-stima .nastro { background:#a9a397; }
+  .affid { border-left:4px solid var(--verde); }
+  .affid.aff-singola { border-left-color:#8a6d50; }
+  .affid.aff-autografo, .affid.aff-speciali { border-left-color:#b39472; }
+  .affid.aff-ritrovare { border-left-color:var(--bordeaux); }
+  .affid.aff-stima { border-left-color:#a9a397; }
+  .affid b.titolo { font-family:var(--serif); font-size:19px; }
+  .certifica { font-size:12.5px; color:var(--grigio); line-height:1.45; margin:8px 2px 0; }
+  .liv { display:inline-block; font-size:10.5px; font-weight:700; border-radius:6px; padding:1px 6px; margin-left:6px; background:var(--salvia); color:var(--verde); vertical-align:1px; }
+  .liv-1 { background:var(--verde); color:#fff; }
+  .gruppo-prezzi { font-size:12px; font-weight:600; color:var(--ottone-testo); text-transform:uppercase; letter-spacing:.6px; margin:12px 0 4px; }
+  .gruppo-prezzi:first-child { margin-top:0; }
+  .confronto { display:flex; gap:8px; align-items:center; }
+  .confronto input { margin:0; }
+  .confronto .btn { width:auto; flex-shrink:0; }
+  .esito-confronto { margin-top:10px; font-size:14px; line-height:1.5; }
+  .storico { border-top:1px solid var(--linea); padding:10px 0; font-size:14px; line-height:1.5; }
+  .storico:first-of-type { border-top:none; }
+  .filtri.tre { grid-template-columns:1fr 1fr 1fr; }
+  @media (max-width:420px) { .filtri.tre { grid-template-columns:1fr 1fr; } }
+  .riepilogo-raccolta { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+  .riepilogo-raccolta div { background:var(--bianco); border-radius:14px; padding:10px; box-shadow:var(--ombra); text-align:center; }
+  .riepilogo-raccolta b { display:block; font-family:var(--serif); font-size:20px; color:var(--verde); }
+  .riepilogo-raccolta span { font-size:11.5px; color:var(--grigio); }
+  .copia { background:var(--bianco); border-radius:16px; box-shadow:var(--ombra); margin-bottom:10px; padding:12px 14px; }
+  .copia .testa { display:flex; gap:12px; align-items:flex-start; }
+  .copia img { width:58px; height:78px; object-fit:cover; border-radius:6px; flex-shrink:0; background:var(--salvia); }
+  .copia .corpo { flex:1; min-width:0; }
+  .copia .senza-foto svg { width:24px; height:24px; }
+  .riepilogo-raccolta b.piccolo { font-size:16px; line-height:1.3; }
 
   /* Libro antico */
   .modulo { background:var(--bianco); border-radius:16px; padding:16px; box-shadow:var(--ombra); }
@@ -318,18 +363,41 @@
         <input id="filtro-testo" placeholder="Cerca nel catalogo" autocomplete="off" aria-label="Cerca nel catalogo">
       </div>
       <div class="chips" id="chips"></div>
-      <div class="filtri">
+      <div class="filtri tre">
         <select id="filtro-stato" aria-label="Affidabilità">
-          <option value="tutti">Tutte le schede</option>
-          <option value="verificata">Verificate</option>
-          <option value="verificata_fonte_singola">Fonte singola</option>
-          <option value="stima_ai">Stima AI</option>
+          <option value="tutti">Ogni affidabilità</option>
+          <option value="piu">Più fonti</option>
+          <option value="singola">Fonte singola</option>
+          <option value="autografo">Solo copie con dedica</option>
+          <option value="speciali">Solo tirature speciali</option>
+          <option value="ritrovare">Fonte da ritrovare</option>
+          <option value="stima">Stima AI</option>
+          <option value="vecchie">Da riverificare (oltre 12 mesi)</option>
+        </select>
+        <select id="filtro-decennio" aria-label="Periodo"><option value="tutti">Ogni periodo</option></select>
+        <select id="filtro-editore" aria-label="Editore"><option value="tutti">Ogni editore</option></select>
+        <select id="filtro-prezzo" aria-label="Fascia di prezzo">
+          <option value="tutti">Ogni prezzo</option>
+          <option value="0-50">Fino a 50 €</option>
+          <option value="50-200">50–200 €</option>
+          <option value="200-1000">200–1.000 €</option>
+          <option value="1000-">Oltre 1.000 €</option>
+          <option value="nessuno">Senza prezzo verificato</option>
+        </select>
+        <select id="filtro-raccolta" aria-label="La mia raccolta">
+          <option value="tutti">Tutto il catalogo</option>
+          <option value="posseduti">Ce l'ho</option>
+          <option value="mancanti">Non ce l'ho</option>
+          <option value="desiderati">Nei desideri</option>
         </select>
         <select id="ordine" aria-label="Ordinamento">
           <option value="autore">Ordina per autore</option>
           <option value="titolo">Ordina per titolo</option>
           <option value="anno-su">Anno (dal più antico)</option>
           <option value="anno-giu">Anno (dal più recente)</option>
+          <option value="prezzo-giu">Prezzo (dal più alto)</option>
+          <option value="prezzo-su">Prezzo (dal più basso)</option>
+          <option value="controllo">Controllo più vecchio</option>
         </select>
       </div>
     </div>
@@ -340,6 +408,18 @@
       <p class="intro" style="margin:6px 0 0">Ogni domenica Linceo salva da solo una copia del catalogo e del Taccuino. Con questo pulsante ne scarichi una adesso sul telefono: conservala in iCloud Drive o Google Drive, nella cartella "Linceo – Backup".</p>
       <button class="btn btn-verde" id="scarica-backup">Scarica copia adesso</button>
     </div>
+  </section>
+
+  <!-- La mia raccolta -->
+  <section id="vista-raccolta" hidden>
+    <h2 class="h2">La mia raccolta</h2>
+    <p class="intro">Le copie che possiedi e i libri che cerchi. Le aggiungi dalla scheda di un libro del catalogo («Ce l'ho», «Lo cerco»).</p>
+    <div class="segmenti" id="r-seg">
+      <button data-r="collezione" class="attivo">Collezione</button>
+      <button data-r="desideri">Desideri</button>
+    </div>
+    <div id="r-riepilogo"></div>
+    <div id="r-elenco"></div>
   </section>
 </main>
 
@@ -364,6 +444,9 @@
   <button data-vista="catalogo">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5a1 1 0 0 1 1-1h3v16H5a1 1 0 0 1-1-1zM8 4h4v16H8zM13.5 5.2l3.4-.9 3.6 13.5-3.4.9z"/></svg>Catalogo
   </button>
+  <button data-vista="raccolta">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Raccolta
+  </button>
 </nav>
 
 <script>
@@ -383,7 +466,18 @@ const SOGLIA = 0.6;
 let utente = null;
 let lettore = null, ultimaRichiesta = null;
 let catalogo = [], caricato = false;
-const filtro = { q:"", genere:"Tutti", stato:"tutti", ordine:"autore" };
+const filtro = { q:"", genere:"Tutti", stato:"tutti", ordine:"autore", decennio:"tutti", editore:"tutti", prezzo:"tutti", raccolta:"tutti" };
+let cambi = { EUR: 1 };              // valuta -> quante unità per 1 euro
+let esemplari = [], desideri = [], vistaR = "collezione";
+const AFF = {
+  piu:       { nome: "Più fonti",              testo: "Il prezzo è confermato da due o più venditori indipendenti." },
+  singola:   { nome: "Fonte singola",          testo: "Il prezzo viene da un solo venditore o da una sola vendita." },
+  autografo: { nome: "Solo copie con dedica",  testo: "Gli unici prezzi trovati sono di copie con dedica o firma dell'autore: il valore di una copia semplice non è ancora noto." },
+  speciali:  { nome: "Solo tirature speciali", testo: "Ci sono prezzi solo per le tirature speciali (numerate, di pregio): per l'edizione comune manca un prezzo verificato." },
+  ritrovare: { nome: "Fonte da ritrovare",     testo: "Il prezzo scritto nella scheda non ha ancora un venditore identificabile: è in coda per la riverifica." },
+  stima:     { nome: "Stima AI",               testo: "Nessun prezzo reale trovato dopo la ricerca: il valore indicato è solo una stima." }
+};
+const SIMBOLO = { EUR: "€", USD: "$", GBP: "£" };
 let fotoCorrente = null;          // { grande: Blob, anteprima: base64 }
 let taccuino = [], filtroT = "attivi";
 
@@ -423,7 +517,7 @@ async function mostraSchermata() {
   $("barra").hidden = !dentro;
   $("esci").hidden = !dentro;
   if (dentro) { vai(vistaAttiva); if (!caricato) caricaCatalogo(); caricaTaccuino(); }
-  else ["vista-cerca","vista-antico","vista-taccuino","vista-catalogo"].forEach(id => $(id).hidden = true);
+  else ["vista-cerca","vista-antico","vista-taccuino","vista-catalogo","vista-raccolta"].forEach(id => $(id).hidden = true);
 }
 $("form-login").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -432,7 +526,7 @@ $("form-login").addEventListener("submit", async (e) => {
   if (error) $("login-errore").textContent = "Accesso non riuscito: controlla email e password.";
   mostraSchermata();
 });
-$("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; taccuino = []; mostraSchermata(); });
+$("esci").addEventListener("click", async () => { await sb.auth.signOut(); caricato = false; catalogo = []; taccuino = []; esemplari = []; desideri = []; mostraSchermata(); });
 
 // ---------- Copia di sicurezza ----------
 $("scarica-backup").addEventListener("click", async () => {
@@ -465,9 +559,10 @@ $("scarica-backup").addEventListener("click", async () => {
 let vistaAttiva = "cerca";
 function vai(v) {
   vistaAttiva = v;
-  ["cerca","antico","taccuino","catalogo"].forEach(n => $("vista-" + n).hidden = n !== v);
+  ["cerca","antico","taccuino","catalogo","raccolta"].forEach(n => $("vista-" + n).hidden = n !== v);
   document.querySelectorAll("nav.schede button").forEach(b => b.classList.toggle("attiva", b.dataset.vista === v));
   if (v === "taccuino") caricaTaccuino();
+  if (v === "raccolta") disegnaRaccolta();
   window.scrollTo(0, 0);
 }
 document.querySelectorAll("nav.schede button").forEach(b => b.addEventListener("click", () => {
@@ -505,15 +600,71 @@ async function chiama(corpo) {
 // ==================================================================
 async function caricaCatalogo() {
   $("conteggio").textContent = "Carico il catalogo…";
-  const { data, error } = await sb.from("edizioni")
-    .select("id, autore, titolo, editore, anno, collana, genere, stato_verifica, mercato")
-    .order("autore");
-  if (error) { $("conteggio").innerHTML = '<span class="errore">Non riesco a caricare il catalogo.</span>'; return; }
-  catalogo = data.map(x => ({ ...x, macro: macroGenere(x.genere), prezzo: prezzoBreve(x.mercato),
-    chiave: norm([x.autore, x.titolo, x.editore, x.collana, x.genere].join(" ")) }));
+  const [ed, si, ca] = await Promise.all([
+    sb.from("edizioni").select("id, autore, titolo, editore, anno, collana, genere, stato_verifica, mercato").order("autore"),
+    sb.from("sintesi_schede").select("id, copertura_fonti, stato_controllo, ultimo_controllo, fonti_indipendenti, vendite_reali, prezzo_min_eur, prezzo_max_eur, prezzi_validi"),
+    sb.from("cambi").select("valuta, per_euro, data")
+  ]);
+  if (ed.error) { $("conteggio").innerHTML = '<span class="errore">Non riesco a caricare il catalogo.</span>'; return; }
+  (ca.data || []).forEach(c => cambi[c.valuta] = Number(c.per_euro));
+  cambi._data = (ca.data || []).map(c => c.data).sort().pop() || null;
+  const sintesi = {};
+  (si.data || []).forEach(s => sintesi[s.id] = s);
+  catalogo = ed.data.map(x => {
+    const s = sintesi[x.id] || {};
+    const r = { ...x, ...s, id: x.id, macro: macroGenere(x.genere), prezzoTesto: prezzoBreve(x.mercato),
+      chiave: norm([x.autore, x.titolo, x.editore, x.collana, x.genere].join(" ")) };
+    r.aff = affidabilita(r);
+    r.vecchia = schedaVecchia(r);
+    return r;
+  });
   caricato = true;
   $("sottotitolo").textContent = catalogo.length + " edizioni in catalogo";
+  riempiFiltri();
+  await caricaRaccolta();
   disegnaCatalogo();
+}
+
+// Affidabilità calcolata dai prezzi registrati (non dall'etichetta scritta a mano)
+function affidabilita(r) {
+  if (r.stato_controllo === "stima_ai" || (!r.copertura_fonti && r.stato_verifica === "stima_ai")) return "stima";
+  if (!r.copertura_fonti) return "ritrovare";
+  return { "più fonti": "piu", "fonte singola": "singola", "solo copie con autografo": "autografo", "solo edizioni speciali": "speciali" }[r.copertura_fonti] || "singola";
+}
+function schedaVecchia(r) {
+  if (r.stato_controllo === "da_riverificare") return true;
+  if (!r.ultimo_controllo) return false;
+  return (Date.now() - new Date(r.ultimo_controllo).getTime()) > 365 * 864e5;
+}
+function numero(n, dec) { return Number(n).toLocaleString("it-IT", { maximumFractionDigits: dec ?? 2 }).replace(/^(-?\d)(\d{3})(?=,|$)/, "$1.$2"); }
+function euro(n) { return numero(Math.round(Number(n)), 0); }
+function forbice(min, max) {
+  if (min == null) return null;
+  return Number(min) === Number(max) ? `${euro(min)} €` : `${euro(min)}–${euro(max)} €`;
+}
+function pillPrezzo(r) {
+  const f = forbice(r.prezzo_min_eur, r.prezzo_max_eur);
+  if (f) return `<span class="pill prezzo">${esc(f)}</span>`;
+  if (r.prezzoTesto) return `<span class="pill prezzo incerto" title="Prezzo non verificato">${esc(r.prezzoTesto)}?</span>`;
+  return "";
+}
+function pillAff(r) { return `<span class="pill aff-${r.aff}">${esc(AFF[r.aff].nome)}</span>${r.vecchia ? `<span class="pill vecchia">Da riverificare</span>` : ""}`; }
+function decennioDi(anno) {
+  if (!anno) return null;
+  if (anno < 1900) return "ante1900";
+  return String(Math.floor(anno / 10) * 10);
+}
+function riempiFiltri() {
+  const dec = [...new Set(catalogo.map(x => decennioDi(x.anno)).filter(Boolean))].sort();
+  $("filtro-decennio").innerHTML = `<option value="tutti">Ogni periodo</option>` + dec.map(d =>
+    `<option value="${d}">${d === "ante1900" ? "Prima del 1900" : `Anni ${d.slice(2)} (${d}–${Number(d) + 9})`}</option>`).join("");
+  const conti = {};
+  catalogo.forEach(x => { if (x.editore) conti[x.editore] = (conti[x.editore] || 0) + 1; });
+  const ed = Object.keys(conti).sort((a, b) => conti[b] - conti[a] || a.localeCompare(b, "it"));
+  $("filtro-editore").innerHTML = `<option value="tutti">Ogni editore</option>` + ed.map(e => `<option value="${esc(e)}">${esc(e)} (${conti[e]})</option>`).join("");
+  $("filtro-decennio").value = filtro.decennio; $("filtro-editore").value = filtro.editore;
+  if (!$("filtro-decennio").value) filtro.decennio = "tutti";
+  if (!$("filtro-editore").value) filtro.editore = "tutti";
 }
 function disegnaChips() {
   const conti = {};
@@ -525,38 +676,58 @@ function disegnaChips() {
 }
 $("chips").addEventListener("click", (e) => { const b = e.target.closest("[data-genere]"); if (!b) return; filtro.genere = b.dataset.genere; disegnaCatalogo(); });
 $("filtro-testo").addEventListener("input", (e) => { filtro.q = norm(e.target.value.trim()); disegnaCatalogo(); });
-$("filtro-stato").addEventListener("change", (e) => { filtro.stato = e.target.value; disegnaCatalogo(); });
-$("ordine").addEventListener("change", (e) => { filtro.ordine = e.target.value; disegnaCatalogo(); });
+[["filtro-stato", "stato"], ["filtro-decennio", "decennio"], ["filtro-editore", "editore"], ["filtro-prezzo", "prezzo"], ["filtro-raccolta", "raccolta"], ["ordine", "ordine"]]
+  .forEach(([id, k]) => $(id).addEventListener("change", (e) => { filtro[k] = e.target.value; disegnaCatalogo(); }));
 
+function nelPrezzo(x) {
+  if (filtro.prezzo === "tutti") return true;
+  if (filtro.prezzo === "nessuno") return x.prezzo_max_eur == null;
+  if (x.prezzo_max_eur == null) return false;
+  const [a, b] = filtro.prezzo.split("-").map(v => v === "" ? null : Number(v));
+  const v = Number(x.prezzo_max_eur);
+  return v >= a && (b == null || v < b);
+}
 function disegnaCatalogo() {
   disegnaChips();
   const parole = filtro.q ? filtro.q.split(/\s+/) : [];
+  const posseduti = new Set(esemplari.map(e => e.edizione_id));
+  const cercati = new Set(desideri.filter(d => d.edizione_id).map(d => d.edizione_id));
   let righe = catalogo.filter(x =>
     (filtro.genere === "Tutti" || x.macro === filtro.genere) &&
-    (filtro.stato === "tutti" || x.stato_verifica === filtro.stato) &&
+    (filtro.stato === "tutti" || (filtro.stato === "vecchie" ? x.vecchia : x.aff === filtro.stato)) &&
+    (filtro.decennio === "tutti" || decennioDi(x.anno) === filtro.decennio) &&
+    (filtro.editore === "tutti" || x.editore === filtro.editore) &&
+    nelPrezzo(x) &&
+    (filtro.raccolta === "tutti" || (filtro.raccolta === "posseduti" ? posseduti.has(x.id) : filtro.raccolta === "mancanti" ? !posseduti.has(x.id) : cercati.has(x.id))) &&
     parole.every(p => x.chiave.includes(p)));
+  const prezzo = (x) => x.prezzo_max_eur == null ? null : Number(x.prezzo_max_eur);
   const cmp = {
     "autore": (a, b) => a.autore.localeCompare(b.autore, "it") || (a.anno || 0) - (b.anno || 0),
     "titolo": (a, b) => a.titolo.localeCompare(b.titolo, "it"),
     "anno-su": (a, b) => (a.anno || 9999) - (b.anno || 9999),
-    "anno-giu": (a, b) => (b.anno || 0) - (a.anno || 0)
+    "anno-giu": (a, b) => (b.anno || 0) - (a.anno || 0),
+    "prezzo-giu": (a, b) => (prezzo(b) ?? -1) - (prezzo(a) ?? -1),
+    "prezzo-su": (a, b) => (prezzo(a) ?? 1e12) - (prezzo(b) ?? 1e12),
+    "controllo": (a, b) => String(a.ultimo_controllo || "0000").localeCompare(String(b.ultimo_controllo || "0000"))
   }[filtro.ordine];
   righe.sort(cmp);
   $("conteggio").textContent = righe.length === catalogo.length ? `${righe.length} edizioni` : `${righe.length} di ${catalogo.length} edizioni`;
-  $("elenco").innerHTML = righe.length ? righe.map(cartolina).join("") : `<div class="vuoto">Nessun libro corrisponde ai filtri.</div>`;
+  $("elenco").innerHTML = righe.length ? righe.map(x => cartolina(x, posseduti.has(x.id), cercati.has(x.id))).join("") : `<div class="vuoto">Nessun libro corrisponde ai filtri.</div>`;
 }
-function cartolina(x) {
+function cartolina(x, posseduto, cercato) {
   const meta = [x.editore, x.anno].filter(Boolean).map(esc).join(" · ");
-  return `<button class="libro s-${esc(x.stato_verifica)}" data-scheda="${esc(x.id)}">
+  const aff = x.aff ? `s-aff-${x.aff}` : `s-${esc(x.stato_verifica)}`;
+  return `<button class="libro ${aff}" data-scheda="${esc(x.id)}">
     <div class="nastro"></div>
     <div class="libro-corpo">
       <div class="libro-titolo">${esc(x.titolo)}</div>
       <div class="libro-autore">${esc(x.autore)}</div>
       <div class="libro-meta">${meta}</div>
       <div class="libro-piede">
-        ${x.prezzo ? `<span class="pill prezzo">${esc(x.prezzo)}</span>` : ""}
+        ${x.aff ? pillPrezzo(x) : (x.prezzo ? `<span class="pill prezzo">${esc(x.prezzo)}</span>` : "")}
         <span class="pill">${esc(x.macro || macroGenere(x.genere))}</span>
-        <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
+        ${x.aff ? pillAff(x) : `<span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>`}
+        ${posseduto ? `<span class="pill mia">Ce l'ho</span>` : ""}${cercato ? `<span class="pill mia">Lo cerco</span>` : ""}
       </div>
     </div>
   </button>`;
@@ -566,22 +737,160 @@ document.addEventListener("click", (e) => {
   const d = e.target.closest("[data-sbn]"); if (d) { apriDettaglioSbn(d.dataset.sbn, !!d.closest("#t-elenco")); return; }
 });
 
+let schedaAperta = null;
 async function apriScheda(id) {
   apriFoglio("Scheda", `<div class="vuoto">Carico la scheda…</div>`);
-  const { data: x, error } = await sb.from("edizioni")
-    .select("*, edizioni_speciali(*), osservazioni_prezzo(*)").eq("id", id).single();
-  if (error || !x) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">Non riesco ad aprire la scheda.</div>`; return; }
-  $("foglio-corpo").innerHTML = schedaCompleta(x);
+  const [ed, si] = await Promise.all([
+    sb.from("edizioni").select("*, edizioni_speciali(*), osservazioni_prezzo(*)").eq("id", id).single(),
+    sb.from("sintesi_schede").select("*").eq("id", id).maybeSingle()
+  ]);
+  const x = ed.data;
+  if (ed.error || !x) { $("foglio-corpo").innerHTML = `<div class="vuoto errore">Non riesco ad aprire la scheda.</div>`; return; }
+  const s = si.data || {};
+  const r = { ...x, ...s, id: x.id };
+  r.aff = affidabilita(r); r.vecchia = schedaVecchia(r);
+  schedaAperta = r;
+  $("foglio-corpo").innerHTML = schedaCompleta(r);
 }
 function sezione(titolo, contenuto) { return contenuto ? `<h3 class="sezione">${esc(titolo)}</h3>${contenuto}` : ""; }
 function elenco(arr) { return (arr && arr.length) ? `<div class="riquadro"><ul class="elenco">${arr.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""; }
+function inEuro(o) { const c = cambi[o.valuta] || (o.valuta === "EUR" ? 1 : null); return c ? Number(o.prezzo) / c : null; }
+function rigaPrezzo(o) {
+  const estero = o.valuta && o.valuta !== "EUR";
+  const eur = estero ? inEuro(o) : null;
+  const chi = o.venditore || o.fonte;
+  const dett = [o.data_rilevazione ? dataBreve(o.data_rilevazione) : "", o.fonte && o.venditore && o.fonte !== o.venditore ? o.fonte : "", o.nota || ""].filter(Boolean).join(" · ");
+  return `<tr><td>${esc(chi)}${o.livello_fonte ? `<span class="liv liv-${o.livello_fonte}">Liv. ${o.livello_fonte}</span>` : ""}
+      <div class="t-meta" style="margin:2px 0 0;font-size:12.5px">${esc(dett)}</div></td>
+    <td class="n">${esc(numero(o.prezzo))} ${esc(SIMBOLO[o.valuta] || o.valuta || "€")}${eur ? `<div class="t-meta" style="margin:2px 0 0;font-weight:400">≈ ${euro(eur)} €</div>` : ""}</td></tr>`;
+}
+function tabellaPrezzi(x) {
+  const oss = (x.osservazioni_prezzo || []).slice().sort((a, b) => String(b.data_rilevazione || "").localeCompare(String(a.data_rilevazione || "")));
+  if (!oss.length) return "";
+  const ed = oss.filter(o => !o.edizione_speciale_id);
+  const gruppi = [
+    ["Vendite reali", ed.filter(o => !o.con_autografo && o.tipo_prezzo === "venduto")],
+    ["Prezzi chiesti dai librai", ed.filter(o => !o.con_autografo && o.tipo_prezzo !== "venduto")],
+    ["Copie con dedica o firma (non contano per il valore dell'edizione)", ed.filter(o => o.con_autografo)]
+  ];
+  (x.edizioni_speciali || []).forEach(sp => gruppi.push([sp.tipo || "Tiratura speciale", oss.filter(o => o.edizione_speciale_id === sp.id)]));
+  const corpo = gruppi.filter(([, l]) => l.length).map(([t, l]) =>
+    `<div class="gruppo-prezzi">${esc(t)}</div><table class="prezzi">${l.map(rigaPrezzo).join("")}</table>`).join("");
+  const nota = oss.some(o => o.valuta && o.valuta !== "EUR") && cambi._data ? `<p class="certifica">Conversione in euro indicativa, al cambio di riferimento BCE del ${esc(dataBreve(cambi._data))}.</p>` : "";
+  return `<div class="riquadro">${corpo}${nota}</div>`;
+}
+function boxAffidabilita(r) {
+  const a = AFF[r.aff];
+  const f = forbice(r.prezzo_min_eur, r.prezzo_max_eur);
+  const numeri = [];
+  if (r.prezzi_validi) numeri.push(`${r.prezzi_validi} ${r.prezzi_validi == 1 ? "prezzo" : "prezzi"} da ${r.fonti_indipendenti || 0} ${r.fonti_indipendenti == 1 ? "venditore" : "venditori"}`);
+  if (r.vendite_reali) numeri.push(`${r.vendite_reali} ${r.vendite_reali == 1 ? "vendita reale" : "vendite reali"}`);
+  return `<div class="riquadro affid aff-${r.aff}">
+    <b class="titolo">${esc(a.nome)}</b>${f ? ` · <b>${esc(f)}</b>` : ""}
+    ${numeri.length ? `<div class="t-meta" style="margin:4px 0 0">${esc(numeri.join(" · "))}</div>` : ""}
+    <p class="testo" style="margin-top:6px">${esc(a.testo)}</p>
+    <div class="t-meta" style="margin:8px 0 0">Ultimo controllo: ${r.ultimo_controllo ? esc(dataBreve(r.ultimo_controllo)) : "non registrato"}</div>
+    ${r.vecchia ? `<p class="avviso">L'ultimo controllo ha più di 12 mesi: questa scheda va riverificata prima di fidarsi del prezzo.</p>` : ""}
+  </div>
+  <p class="certifica">Linceo certifica i dati di questa scheda (prezzi, fonti, date dei controlli), non la copia che hai in mano: controlla sempre i punti per riconoscere l'edizione e lo stato del tuo esemplare.</p>`;
+}
+function boxConfronto(r) {
+  const validi = (r.osservazioni_prezzo || []).filter(o => !o.edizione_speciale_id && !o.con_autografo).map(inEuro).filter(v => v != null);
+  if (!validi.length) return "";
+  return `<div class="riquadro">
+    <div class="etichetta">Ti chiedono…</div>
+    <div class="confronto"><input type="number" inputmode="decimal" min="0" placeholder="Prezzo in euro" id="prezzo-chiesto" aria-label="Prezzo che ti chiedono">
+      <button class="btn btn-verde" data-confronta>Confronta</button></div>
+    <div class="esito-confronto" id="esito-confronto"></div>
+  </div>`;
+}
+function confronta() {
+  const r = schedaAperta; if (!r) return;
+  const v = Number(String($("prezzo-chiesto").value).replace(",", "."));
+  const out = $("esito-confronto");
+  if (!v) { out.textContent = "Scrivi il prezzo che ti chiedono."; return; }
+  const ed = (r.osservazioni_prezzo || []).filter(o => !o.edizione_speciale_id && !o.con_autografo);
+  const tutti = ed.map(inEuro).filter(n => n != null).sort((a, b) => a - b);
+  const vendite = ed.filter(o => o.tipo_prezzo === "venduto").map(inEuro).filter(n => n != null);
+  const min = tutti[0], max = tutti[tutti.length - 1];
+  let msg;
+  if (v < min * 0.7) msg = `<b>Molto sotto i prezzi rilevati</b> (${euro(min)}–${euro(max)} €). Può essere un affare, o una copia difettosa, incompleta o non della prima tiratura: controlla bene.`;
+  else if (v < min) msg = `<b>Sotto i prezzi rilevati</b> (${euro(min)}–${euro(max)} €).`;
+  else if (v <= max) msg = `<b>Dentro la forbice dei prezzi rilevati</b> (${euro(min)}–${euro(max)} €).`;
+  else if (v <= max * 1.3) msg = `<b>Un po' sopra i prezzi rilevati</b> (${euro(min)}–${euro(max)} €).`;
+  else msg = `<b>Molto sopra i prezzi rilevati</b> (${euro(min)}–${euro(max)} €).`;
+  if (vendite.length) msg += ` Le vendite reali registrate: ${vendite.map(euro).join(", ")} €.`;
+  if (r.aff === "singola") msg += " Attenzione: il confronto si basa su un solo venditore.";
+  if (r.vecchia) msg += " I prezzi hanno più di 12 mesi.";
+  out.innerHTML = msg;
+}
+
+const CONDIZIONI = ["Come nuovo", "Ottimo", "Molto buono", "Buono", "Discreto", "Mediocre"];
+function formCopia(e, edizioneId) {
+  e = e || {};
+  const opz = CONDIZIONI.map(c => `<option ${e.condizione === c ? "selected" : ""}>${c}</option>`).join("");
+  return `<form class="form-copia" data-id="${esc(e.id || "")}" data-edizione="${esc(edizioneId)}">
+    <label>Condizioni<select name="condizione"><option value="">—</option>${opz}</select></label>
+    <label>Legatura e sovraccoperta<input name="legatura" value="${esc(e.legatura || "")}" placeholder="es. brossura con sovraccoperta"></label>
+    <label>Completezza<input name="completezza" value="${esc(e.completezza || "")}" placeholder="es. completo di tavole e fascetta"></label>
+    <label>Dedica o firma<input name="dedica_autografo" value="${esc(e.dedica_autografo || "")}" placeholder="lascia vuoto se non c'è"></label>
+    <label>Provenienza<input name="provenienza" value="${esc(e.provenienza || "")}" placeholder="es. Mercatino di Piazza Diaz"></label>
+    <div class="due" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label>Prezzo pagato (€)<input name="prezzo_acquisto" type="number" inputmode="decimal" min="0" step="0.01" value="${esc(e.prezzo_acquisto ?? "")}"></label>
+      <label>Data d'acquisto<input name="data_acquisto" type="date" value="${esc(e.data_acquisto || "")}"></label>
+    </div>
+    <label>Dove si trova<input name="posizione" value="${esc(e.posizione || "")}" placeholder="es. Studio, libreria 2, ripiano 3"></label>
+    <label>Note<textarea name="note" rows="2">${esc(e.note || "")}</textarea></label>
+    <label>Foto della tua copia<input name="foto" type="file" accept="image/*"></label>
+    <div class="riga-btn"><button type="submit" class="btn btn-verde">${e.id ? "Salva le modifiche" : "Aggiungi alla collezione"}</button></div>
+  </form>`;
+}
+function formDesiderio(d, edizioneId) {
+  d = d || {};
+  return `<form class="form-desiderio" data-id="${esc(d.id || "")}" data-edizione="${esc(edizioneId || "")}">
+    ${edizioneId ? "" : `<label>Titolo e autore<input name="testo" required value="${esc(d.testo || "")}" placeholder="es. Calvino, Il sentiero dei nidi di ragno, Einaudi 1947"></label>`}
+    <label>Spenderei al massimo (€)<input name="prezzo_max" type="number" inputmode="decimal" min="0" step="1" value="${esc(d.prezzo_max ?? "")}"></label>
+    <label>Nota<input name="nota" value="${esc(d.nota || "")}" placeholder="es. solo con sovraccoperta"></label>
+    <div class="riga-btn"><button type="submit" class="btn btn-verde">${d.id ? "Salva" : "Aggiungi ai desideri"}</button></div>
+  </form>`;
+}
+function boxRaccolta(r) {
+  const mie = esemplari.filter(e => e.edizione_id === r.id);
+  const des = desideri.find(d => d.edizione_id === r.id);
+  let h = "";
+  if (mie.length) h += mie.map(e => `<div class="riquadro" style="background:#f3edf4">
+      <div class="etichetta">La tua copia</div>
+      <p class="testo">${esc([e.condizione, e.legatura, e.completezza].filter(Boolean).join(" · ") || "Senza descrizione")}</p>
+      ${e.dedica_autografo ? `<p class="testo">Dedica o firma: ${esc(e.dedica_autografo)}</p>` : ""}
+      <div class="t-meta" style="margin-top:4px">${esc([e.prezzo_acquisto != null ? `Pagata ${euro(e.prezzo_acquisto)} €` : "", e.data_acquisto ? dataBreve(e.data_acquisto) : "", e.posizione].filter(Boolean).join(" · "))}</div>
+      <div class="riga-btn"><button class="btn btn-tenue" style="margin-top:0" data-modifica-copia="${e.id}">Modifica</button></div>
+    </div>`).join("");
+  h += `<details><summary>${mie.length ? "Aggiungi un'altra copia" : "Ce l'ho: aggiungi alla mia collezione"}</summary>${formCopia(null, r.id)}</details>`;
+  if (des) h += `<div class="riquadro" style="background:#f3edf4"><div class="etichetta">Nei tuoi desideri</div>
+      <p class="testo">${des.prezzo_max != null ? `Spenderesti al massimo ${euro(des.prezzo_max)} €` : "Senza prezzo massimo"}${des.nota ? ` · ${esc(des.nota)}` : ""}</p>
+      <div class="riga-btn"><button class="btn btn-rosso" data-togli-desiderio="${des.id}">Togli dai desideri</button></div></div>`;
+  else if (!mie.length) h += `<details><summary>Lo cerco: aggiungi ai desideri</summary>${formDesiderio(null, r.id)}</details>`;
+  return h;
+}
+function boxStorico(r) {
+  const st = (r.mercato_storico || []).slice().reverse();
+  if (!st.length) return "";
+  return `<details class="riquadro" style="padding:6px 14px"><summary>Versioni precedenti (${st.length})</summary>
+    ${st.map(v => `<div class="storico">
+      <div class="t-meta" style="margin:0 0 4px">In uso fino al ${esc(dataBreve(v.fino_al))}${v.stato_verifica ? " · " + esc(ETICHETTE[v.stato_verifica] || v.stato_verifica) : ""}${v.aggiornamento ? " · scheda del " + esc(dataBreve(v.aggiornamento)) : ""}</div>
+      ${v.mercato ? `<p class="testo">${esc(v.mercato)}</p>` : ""}
+      ${v.affidabilita ? `<p class="t-meta" style="margin:4px 0 0">${esc(v.affidabilita)}</p>` : ""}
+    </div>`).join("")}
+  </details>`;
+}
 
 function schedaCompleta(x) {
-  const prezzo = prezzoBreve(x.mercato);
-  const id = [["Editore", x.editore], ["Anno", x.anno], ["Collana", x.collana], ["Genere", x.genere],
+  const collana = x.collana ? x.collana + (x.collana_numero ? " n. " + x.collana_numero : "") : null;
+  const id = [["Editore", x.editore], ["Luogo", x.luogo], ["Anno", x.anno], ["Collana", collana], ["Genere", x.genere],
     ["Traduttore", x.traduttore], ["ISBN", x.isbn], ["Prima edizione", x.prima_edizione === false ? "No" : "Sì"]]
     .filter(([, v]) => v !== null && v !== undefined && v !== "")
-    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")
+    + (x.codice_sbn ? `<dt>Codice SBN</dt><dd class="codice">${esc(x.codice_sbn)}</dd>` : "");
   const speciali = (x.edizioni_speciali || []).sort((a, b) => a.ordine - b.ordine).map(s => `
     <div class="speciale"><b>${esc(s.tipo || "Edizione speciale")}</b>
       ${s.tiratura ? `<div class="t-meta">${esc(s.tiratura)}</div>` : ""}
@@ -590,37 +899,187 @@ function schedaCompleta(x) {
       ${s.mercato ? `<p class="testo" style="margin-top:6px"><b style="font-family:var(--sans);font-size:14px">Mercato:</b> ${esc(s.mercato)}</p>` : ""}
       ${s.fonte ? `<div class="t-meta" style="margin-top:6px">Fonte: ${esc(s.fonte)}</div>` : ""}
     </div>`).join("");
-  const oss = (x.osservazioni_prezzo || []).sort((a, b) => String(b.data_rilevazione || "").localeCompare(String(a.data_rilevazione || "")));
-  const tabellaPrezzi = oss.length ? `<div class="riquadro"><table class="prezzi">${oss.map(o =>
-    `<tr><td>${esc(o.fonte)}<div class="t-meta" style="margin:2px 0 0">${esc(o.data_rilevazione || "")}${o.con_autografo ? " · con autografo" : ""}</div></td><td class="n">${esc(Number(o.prezzo).toLocaleString("it-IT"))} €</td></tr>`).join("")}</table></div>` : "";
   const ricercaFoto = (x.foto_riferimento || "").replace(/^Ricerca immagini per:\s*/i, "") || `${x.autore} ${x.titolo} ${x.editore || ""} ${x.anno || ""}`;
-  const sbnLink = permalinkSbn(x.codice_sbn);
   const collegamenti = `<div class="collegamenti">
       <a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ricercaFoto)}" target="_blank" rel="noopener">Foto di riferimento</a>
-      ${sbnLink ? `<a href="${linkSicuro(sbnLink)}" target="_blank" rel="noopener">OPAC SBN</a>` : ""}
     </div>`;
   return `
-    <span class="pill stato-${esc(x.stato_verifica)}">${esc(ETICHETTE[x.stato_verifica] || "")}</span>
+    ${pillAff(x)}
     <span class="pill">${esc(macroGenere(x.genere))}</span>
-    ${prezzo ? `<span class="pill prezzo">${esc(prezzo)}</span>` : ""}
+    ${pillPrezzo({ ...x, prezzoTesto: prezzoBreve(x.mercato) })}
     <h1 class="copertina-titolo">${esc(x.titolo)}</h1>
     <p class="copertina-autore">${esc(x.autore)}</p>
     <div class="riquadro"><dl class="griglia">${id}</dl></div>
     ${collegamenti}
+    ${sezione("Affidabilità", boxAffidabilita(x))}
+    ${sezione("Prezzo", boxConfronto(x))}
+    ${sezione("La mia raccolta", boxRaccolta(x))}
     ${sezione("Prima edizione", (x.descrizione || x.prima_edizione_nota) ? `<div class="riquadro">${x.prima_edizione_nota ? `<p class="avviso" style="margin-top:0">${esc(x.prima_edizione_nota)}</p>` : ""}<p class="testo">${esc(x.descrizione || "")}</p></div>` : "")}
     ${sezione("Prima tiratura", elenco(x.prima_tiratura))}
     ${sezione("Trappole da evitare", (x.trappole || []).map(t => `<div class="trappola">${esc(t)}</div>`).join(""))}
     ${sezione("Edizioni speciali", speciali)}
     ${sezione("Mercato", x.mercato ? `<div class="riquadro oro"><p class="testo">${esc(x.mercato)}</p></div>` : "")}
-    ${sezione("Rilevazioni di prezzo", tabellaPrezzi)}
+    ${sezione("Rilevazioni di prezzo", tabellaPrezzi(x))}
     ${sezione("Consigli d'acquisto", x.acquisto ? `<div class="riquadro"><p class="testo">${esc(x.acquisto)}</p></div>` : "")}
     ${sezione("Aneddoti e contesto", (x.aneddoti || []).map(t => `<div class="aneddoto">${esc(t)}</div>`).join(""))}
     ${sezione("Ristampe", elenco(x.ristampe))}
     ${sezione("Varianti", elenco(x.varianti))}
     ${sezione("Fonti", elenco(x.fonti))}
-    ${sezione("Affidabilità", `<div class="riquadro"><p class="testo">${esc(x.affidabilita)}</p>${x.aggiornamento ? `<div class="t-meta" style="margin-top:8px">Aggiornata il ${esc(new Date(x.aggiornamento).toLocaleDateString("it-IT"))}</div>` : ""}</div>`)}
+    ${sezione("Nota di affidabilità", `<div class="riquadro"><p class="testo">${esc(x.affidabilita)}</p>${x.aggiornamento ? `<div class="t-meta" style="margin-top:8px">Scheda aggiornata il ${esc(dataBreve(x.aggiornamento))}</div>` : ""}</div>`)}
+    ${sezione("Storico", boxStorico(x))}
   `;
 }
+
+// ==================================================================
+// LA MIA RACCOLTA (collezione e desideri)
+// ==================================================================
+async function caricaRaccolta() {
+  if (!utente) return;
+  const [e, d] = await Promise.all([
+    sb.from("esemplari").select("*").order("creato_il", { ascending: false }),
+    sb.from("desideri").select("*").order("creato_il", { ascending: false })
+  ]);
+  esemplari = e.data || []; desideri = d.data || [];
+  if (vistaAttiva === "raccolta") disegnaRaccolta();
+}
+function libroDi(id) { return catalogo.find(x => x.id === id); }
+async function urlFoto(path) {
+  if (!path) return null;
+  const { data } = await sb.storage.from("taccuino").createSignedUrl(path, 600);
+  return data && data.signedUrl;
+}
+async function disegnaRaccolta() {
+  document.querySelectorAll("#r-seg button").forEach(b => b.classList.toggle("attivo", b.dataset.r === vistaR));
+  if (vistaR === "collezione") {
+    const speso = esemplari.reduce((t, e) => t + (Number(e.prezzo_acquisto) || 0), 0);
+    let vmin = 0, vmax = 0, conValore = 0;
+    esemplari.forEach(e => { const l = libroDi(e.edizione_id); if (l && l.prezzo_min_eur != null) { vmin += Number(l.prezzo_min_eur); vmax += Number(l.prezzo_max_eur); conValore++; } });
+    $("r-riepilogo").innerHTML = `<div class="riepilogo-raccolta">
+      <div><b>${esemplari.length}</b><span>copie</span></div>
+      <div><b>${euro(speso)} €</b><span>spesi</span></div>
+      <div><b class="piccolo">${conValore ? esc(forbice(vmin, vmax)) : "—"}</b><span>prezzi rilevati${conValore && conValore < esemplari.length ? ` (${conValore} su ${esemplari.length})` : ""}</span></div>
+    </div>`;
+    if (!esemplari.length) { $("r-elenco").innerHTML = `<div class="vuoto">Ancora nessuna copia. Apri un libro del catalogo e tocca «Ce l'ho».</div>`; return; }
+    $("r-elenco").innerHTML = esemplari.map(e => {
+      const l = libroDi(e.edizione_id) || { titolo: e.edizione_id, autore: "" };
+      const f = l.prezzo_min_eur != null ? forbice(l.prezzo_min_eur, l.prezzo_max_eur) : null;
+      return `<div class="copia"><div class="testa">
+        ${e.foto_path ? `<img data-foto-copia="${esc(e.foto_path)}" alt="Foto della copia">` : `<div class="senza-foto" style="width:58px;height:78px;border-radius:6px;background:var(--salvia);display:flex;align-items:center;justify-content:center;color:var(--verde);flex-shrink:0">${ICONA_FOTO}</div>`}
+        <div class="corpo">
+          <div class="voce-titolo">${esc(l.titolo)}</div>
+          <div class="t-meta" style="margin:0 0 4px">${esc([l.autore, l.editore, l.anno].filter(Boolean).join(" · "))}</div>
+          <div class="libro-piede" style="margin-top:2px">
+            ${e.condizione ? `<span class="pill">${esc(e.condizione)}</span>` : ""}
+            ${e.prezzo_acquisto != null ? `<span class="pill">Pagata ${euro(e.prezzo_acquisto)} €</span>` : ""}
+            ${f ? `<span class="pill prezzo">Rilevati ${esc(f)}</span>` : ""}
+          </div>
+          ${e.posizione ? `<div class="t-meta" style="margin:6px 0 0">📍 ${esc(e.posizione)}</div>` : ""}
+        </div></div>
+        <div class="riga-btn"><button class="btn btn-tenue" style="margin-top:0" data-scheda="${esc(e.edizione_id)}">Scheda</button>
+          <button class="btn btn-tenue" style="margin-top:0" data-modifica-copia="${e.id}">Modifica</button>
+          <button class="btn btn-rosso" data-elimina-copia="${e.id}">Elimina</button></div>
+      </div>`;
+    }).join("");
+    document.querySelectorAll("[data-foto-copia]").forEach(async img => { const u = await urlFoto(img.dataset.fotoCopia); if (u) img.src = u; });
+  } else {
+    $("r-riepilogo").innerHTML = `<details class="riquadro" style="padding:6px 14px"><summary>Aggiungi un libro che non è nel catalogo</summary>${formDesiderio(null, null)}</details>`;
+    if (!desideri.length) { $("r-elenco").innerHTML = `<div class="vuoto">Nessun desiderio. Apri un libro del catalogo e tocca «Lo cerco», o aggiungilo qui sopra.</div>`; return; }
+    $("r-elenco").innerHTML = desideri.map(d => {
+      const l = d.edizione_id ? libroDi(d.edizione_id) : null;
+      const f = l && l.prezzo_min_eur != null ? forbice(l.prezzo_min_eur, l.prezzo_max_eur) : null;
+      let giudizio = "";
+      if (l && l.prezzo_min_eur != null && d.prezzo_max != null) {
+        giudizio = Number(d.prezzo_max) >= Number(l.prezzo_min_eur)
+          ? `<p class="testo" style="margin-top:6px">Il tuo budget rientra nei prezzi rilevati.</p>`
+          : `<p class="testo" style="margin-top:6px">Il tuo budget è sotto il prezzo più basso rilevato (${euro(l.prezzo_min_eur)} €).</p>`;
+      }
+      return `<div class="copia">
+        <div class="voce-titolo">${esc(l ? l.titolo : d.testo)}</div>
+        ${l ? `<div class="t-meta" style="margin:0 0 4px">${esc([l.autore, l.editore, l.anno].filter(Boolean).join(" · "))}</div>` : `<div class="t-meta" style="margin:0 0 4px">Non ancora nel catalogo</div>`}
+        <div class="libro-piede">
+          ${d.prezzo_max != null ? `<span class="pill">Max ${euro(d.prezzo_max)} €</span>` : ""}
+          ${f ? `<span class="pill prezzo">Rilevati ${esc(f)}</span>` : ""}
+        </div>
+        ${giudizio}${d.nota ? `<p class="t-meta" style="margin:6px 0 0">${esc(d.nota)}</p>` : ""}
+        <div class="riga-btn">${l ? `<button class="btn btn-tenue" style="margin-top:0" data-scheda="${esc(l.id)}">Scheda</button>` : ""}
+          <button class="btn btn-rosso" data-togli-desiderio="${d.id}">Togli</button></div>
+      </div>`;
+    }).join("");
+  }
+}
+$("r-seg").addEventListener("click", (e) => { const b = e.target.closest("[data-r]"); if (!b) return; vistaR = b.dataset.r; disegnaRaccolta(); });
+
+async function salvaCopia(form) {
+  const b = form.querySelector("button[type=submit]"); b.disabled = true;
+  const f = new FormData(form);
+  const riga = {};
+  ["condizione", "legatura", "completezza", "dedica_autografo", "provenienza", "data_acquisto", "posizione", "note"].forEach(k => riga[k] = (f.get(k) || "").toString().trim() || null);
+  const p = (f.get("prezzo_acquisto") || "").toString().replace(",", ".");
+  riga.prezzo_acquisto = p === "" ? null : Number(p);
+  const file = f.get("foto");
+  try {
+    if (file && file.size) {
+      const foto = await preparaFoto(file);
+      const path = `${utente.id}/collezione/${Date.now()}.jpg`;
+      const { error: eF } = await sb.storage.from("taccuino").upload(path, foto.grande, { contentType: "image/jpeg", upsert: false });
+      if (!eF) riga.foto_path = path; else avvisa("La foto non è stata caricata, salvo comunque la copia.");
+    }
+    const id = form.dataset.id;
+    const q = id ? sb.from("esemplari").update(riga).eq("id", id) : sb.from("esemplari").insert({ ...riga, edizione_id: form.dataset.edizione });
+    const { error } = await q;
+    if (error) throw error;
+    avvisa(id ? "Copia aggiornata." : "Aggiunta alla tua collezione.");
+    await caricaRaccolta();
+    if (caricato) disegnaCatalogo();
+    if (schedaAperta && schedaAperta.id === form.dataset.edizione && !id) $("foglio-corpo").innerHTML = schedaCompleta(schedaAperta);
+    else if (id) history.back();
+  } catch (e) {
+    avvisa("Non sono riuscito a salvare la copia. Riprova.");
+    b.disabled = false;
+  }
+}
+async function salvaDesiderio(form) {
+  const b = form.querySelector("button[type=submit]"); b.disabled = true;
+  const f = new FormData(form);
+  const p = (f.get("prezzo_max") || "").toString().replace(",", ".");
+  const riga = { prezzo_max: p === "" ? null : Number(p), nota: (f.get("nota") || "").toString().trim() || null };
+  if (form.dataset.edizione) riga.edizione_id = form.dataset.edizione; else riga.testo = (f.get("testo") || "").toString().trim();
+  const { error } = await sb.from("desideri").insert(riga);
+  if (error) { avvisa("Non sono riuscito a salvare. Riprova."); b.disabled = false; return; }
+  avvisa("Aggiunto ai desideri.");
+  await caricaRaccolta();
+  if (caricato) disegnaCatalogo();
+  if (schedaAperta && form.dataset.edizione === schedaAperta.id) $("foglio-corpo").innerHTML = schedaCompleta(schedaAperta);
+}
+document.addEventListener("submit", (e) => {
+  if (e.target.matches(".form-copia")) { e.preventDefault(); salvaCopia(e.target); }
+  else if (e.target.matches(".form-desiderio")) { e.preventDefault(); salvaDesiderio(e.target); }
+});
+document.addEventListener("click", async (e) => {
+  const t = e.target.closest("[data-confronta], [data-modifica-copia], [data-elimina-copia], [data-togli-desiderio]");
+  if (!t) return;
+  if (t.dataset.confronta !== undefined) { confronta(); return; }
+  if (t.dataset.modificaCopia) {
+    const c = esemplari.find(x => String(x.id) === t.dataset.modificaCopia); if (!c) return;
+    const l = libroDi(c.edizione_id);
+    apriFoglio("La tua copia", `<h1 class="copertina-titolo" style="font-size:24px">${esc(l ? l.titolo : "")}</h1><div class="modulo">${formCopia(c, c.edizione_id)}</div>`);
+    return;
+  }
+  if (t.dataset.eliminaCopia && !confirm("Eliminare questa copia dalla tua collezione?")) return;
+  t.disabled = true;
+  if (t.dataset.eliminaCopia) {
+    const c = esemplari.find(x => String(x.id) === t.dataset.eliminaCopia);
+    const { error } = await sb.from("esemplari").delete().eq("id", t.dataset.eliminaCopia);
+    if (!error && c && c.foto_path) await sb.storage.from("taccuino").remove([c.foto_path]);
+    avvisa(error ? "Operazione non riuscita." : "Copia eliminata.");
+  } else if (t.dataset.togliDesiderio) {
+    const { error } = await sb.from("desideri").delete().eq("id", t.dataset.togliDesiderio);
+    avvisa(error ? "Operazione non riuscita." : "Tolto dai desideri.");
+  }
+  await caricaRaccolta();
+  if (caricato) disegnaCatalogo();
+  if (schedaAperta && $("foglio").classList.contains("aperto") && $("foglio-titolo").textContent === "Scheda") $("foglio-corpo").innerHTML = schedaCompleta(schedaAperta);
+});
 
 // ==================================================================
 // DETTAGLIO SBN (scheda completa + confronto con la copia + copie digitali)
