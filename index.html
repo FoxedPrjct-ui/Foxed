@@ -82,6 +82,20 @@
   .segmenti button.attivo { background:var(--bianco); color:var(--verde); box-shadow:var(--ombra); }
   .doppioni { display:inline-block; margin-top:6px; font-size:12px; color:var(--grigio); }
   .tessera:disabled { opacity:.5; }
+  .tessera.foto:disabled { background:var(--salvia); color:var(--grigio); box-shadow:none; }
+  .wip { font-style:normal; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; background:rgba(0,0,0,.08); padding:2px 6px; border-radius:6px; margin-left:4px; vertical-align:2px; }
+  .gruppo-autore { display:flex; justify-content:space-between; align-items:center; width:100%; border:none; text-align:left; background:var(--verde); color:#fff; border-radius:16px; padding:14px 16px; margin-bottom:10px; box-shadow:var(--ombra); }
+  .gruppo-autore b { font-family:var(--serif); font-size:20px; font-weight:700; }
+  .gruppo-autore small { display:block; opacity:.85; font-size:13px; margin-top:2px; }
+  .gruppo-autore span { font-size:22px; opacity:.8; }
+  .titolo-sezione { display:flex; justify-content:space-between; align-items:baseline; }
+  .titolo-sezione em { font-style:normal; color:var(--grigio); font-size:13px; text-transform:none; letter-spacing:0; font-weight:500; }
+  .chips-ricerca { display:flex; gap:6px; overflow-x:auto; margin:0 0 12px; padding-bottom:2px; }
+  .mostra-tutte { display:block; width:100%; border:none; background:none; color:var(--verde); font-weight:600; font-size:15px; padding:8px; margin-bottom:6px; }
+  .fuori-catalogo { display:flex; justify-content:space-between; align-items:center; width:100%; border:none; text-align:left; background:var(--salvia); color:var(--verde); border-radius:14px; padding:14px 16px; font-size:15px; }
+  .ricerca-attiva { display:flex; justify-content:space-between; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:10px 12px; font-size:14px; }
+  .ricerca-attiva button { border:none; background:var(--salvia); color:var(--verde); border-radius:10px; padding:6px 10px; font-weight:600; }
+  .nota-ricerca { color:var(--grigio); font-size:12.5px; margin:6px 2px 16px; }
   .barra-ricerca { display:flex; gap:8px; align-items:center; background:var(--bianco); border:1px solid var(--linea); border-radius:14px; padding:4px 4px 4px 12px; box-shadow:var(--ombra); }
   .barra-ricerca svg { width:18px; height:18px; color:var(--grigio); flex-shrink:0; }
   .barra-ricerca input { border:none; margin:0; padding:10px 4px; box-shadow:none; background:transparent; }
@@ -311,22 +325,30 @@
 
   <!-- Cerca -->
   <section id="vista-cerca" hidden>
+    <div class="etichetta-ricerca" style="margin-top:0">Cerca un libro</div>
+    <form class="barra-ricerca" id="form-cerca">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="campo" placeholder="Autore, titolo o ISBN" autocomplete="off" aria-label="Cerca per ISBN, titolo o autore">
+      <button type="submit">Cerca</button>
+    </form>
+    <p class="nota-ricerca">Cerca prima nel tuo catalogo; se non lo trova, guarda in SBN.</p>
+
     <div class="tessere">
       <button class="tessera barcode" id="scansiona">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>
-        <div><b>Barcode</b><br><span>Libri con ISBN</span></div>
-      </button>
-      <button class="tessera foto" id="fotografa">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
-        <div><b>Foto</b><br><span>Copertina o frontespizio</span></div>
+        <div><b>Barcode</b><br><span>Inquadra l'ISBN sul retro</span></div>
       </button>
       <button class="tessera sbn" id="vai-sbn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="17.5" cy="16.5" r="3"/><path d="m21.5 20.5-1.8-1.8"/></svg>
-        <div><b>Ricerca SBN</b><br><span>Autore, titolo, editore, anni</span></div>
+        <div><b>Ricerca avanzata</b><br><span>Campi separati: autore, titolo, editore, anni</span></div>
       </button>
       <button class="tessera antico" id="vai-antico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>
         <div><b>Libro antico</b><br><span>Stampati fino al 1830</span></div>
+      </button>
+      <button class="tessera foto" id="fotografa" disabled aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+        <div><b>Foto <em class="wip">in arrivo</em></b><br><span>Non ancora attiva</span></div>
       </button>
     </div>
     <input type="file" id="file-foto" accept="image/*" capture="environment" hidden>
@@ -345,19 +367,13 @@
       <button class="btn btn-tenue" id="foto-annulla">Annulla</button>
     </div>
 
-    <div class="etichetta-ricerca">Ricerca veloce</div>
-    <form class="barra-ricerca" id="form-cerca">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="campo" placeholder="ISBN, titolo o autore" autocomplete="off" aria-label="Cerca per ISBN, titolo o autore">
-      <button type="submit">Cerca</button>
-    </form>
     <div id="stato" class="stato" role="status"></div>
     <div id="risultati"></div>
   </section>
 
   <!-- Libro antico -->
   <section id="vista-antico" hidden>
-    <h2 class="h2" id="a-titolo-vista">Ricerca SBN</h2>
+    <h2 class="h2" id="a-titolo-vista">Ricerca avanzata</h2>
     <div class="segmenti" id="a-epoca">
       <button type="button" data-epoca="moderno" class="attivo">Dal 1831 a oggi</button>
       <button type="button" data-epoca="antico">Libro antico</button>
@@ -390,10 +406,8 @@
   <!-- Catalogo -->
   <section id="vista-catalogo" hidden>
     <div class="strumenti">
-      <div class="barra-ricerca">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="filtro-testo" placeholder="Cerca nel catalogo" autocomplete="off" aria-label="Cerca nel catalogo">
-      </div>
+      <input type="hidden" id="filtro-testo">
+      <div class="ricerca-attiva" id="ricerca-attiva" hidden><span id="ricerca-attiva-testo"></span><button type="button" id="ricerca-attiva-togli">Mostra tutto</button></div>
       <div class="chips" id="chips"></div>
       <div class="filtri tre">
         <select id="filtro-stato" aria-label="Affidabilità">
@@ -467,7 +481,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Cerca
   </button>
   <button data-vista="antico">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>SBN
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5C6.5 4 9.5 4 12 5.5v14C9.5 18 6.5 18 4 19.5z"/><path d="M20 5.5C17.5 4 14.5 4 12 5.5v14c2.5-1.5 5.5-1.5 8 0z"/><path d="M7 9h2.5M7 12h2.5M14.5 9H17M14.5 12H17"/></svg>Avanzata
   </button>
   <button data-vista="taccuino">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12.5 8H16M12.5 12H16"/></svg>Taccuino
@@ -727,7 +741,14 @@ function disegnaChips() {
     `<button class="chip ${filtro.genere === n ? "attivo" : ""}" data-genere="${esc(n)}">${esc(n)}<i>${c}</i></button>`).join("");
 }
 $("chips").addEventListener("click", (e) => { const b = e.target.closest("[data-genere]"); if (!b) return; filtro.genere = b.dataset.genere; disegnaCatalogo(); });
-$("filtro-testo").addEventListener("input", (e) => { filtro.q = norm(e.target.value.trim()); disegnaCatalogo(); });
+// La ricerca si fa solo dalla barra unica (scheda Cerca); qui si vede solo quale ricerca è attiva
+function impostaRicercaCatalogo(testo) {
+  filtro.q = norm((testo || "").trim());
+  $("ricerca-attiva").hidden = !filtro.q;
+  $("ricerca-attiva-testo").textContent = filtro.q ? `Ricerca: «${testo.trim()}»` : "";
+  if (caricato) disegnaCatalogo();
+}
+$("ricerca-attiva-togli").addEventListener("click", () => impostaRicercaCatalogo(""));
 [["filtro-stato", "stato"], ["filtro-decennio", "decennio"], ["filtro-editore", "editore"], ["filtro-prezzo", "prezzo"], ["filtro-raccolta", "raccolta"], ["ordine", "ordine"]]
   .forEach(([id, k]) => $(id).addEventListener("change", (e) => { filtro[k] = e.target.value; disegnaCatalogo(); }));
 
@@ -1358,7 +1379,7 @@ async function apriDettaglioSbn(codice, dalTaccuino) {
 // CERCA: barcode, foto, testo
 // ==================================================================
 function pulisciSchermo() { $("risultati").innerHTML = ""; $("stato").textContent = ""; }
-function bloccaPulsanti(si) { $("scansiona").disabled = si; $("fotografa").disabled = si; }
+function bloccaPulsanti(si) { $("scansiona").disabled = si; } // la Foto resta spenta: in arrivo
 
 $("scansiona").addEventListener("click", async () => {
   pulisciSchermo(); chiudiPannelloFoto();
@@ -1446,22 +1467,79 @@ $("form-cerca").addEventListener("submit", (e) => {
   pulisciSchermo(); chiudiPannelloFoto();
   const cifre = v.replace(/[-\s]/g, "");
   if (/^(\d{9}[\dXx]|\d{13})$/.test(cifre)) cerca({ isbn: cifre }, "Cerco l'ISBN…", { origine: "barcode", automatico: false });
-  else cerca({ testo: v }, "Cerco…", { origine: "testo", automatico: false });
+  else cercaUnica(v);
+});
+
+// ---------- Barra unica ----------
+const ricercaUnica = { testo: "", trovati: [], vista: "tutti", ordine: "anno", tutte: false };
+async function cercaUnica(v) {
+  if (!caricato) { $("stato").textContent = "Carico il catalogo…"; await caricaCatalogo(); $("stato").textContent = ""; }
+  const parole = norm(v).split(/\s+/).filter(Boolean);
+  const trovati = catalogo.filter(x => parole.every(p => x.chiave.includes(p)));
+  if (!trovati.length) { cerca({ testo: v }, "Non è nel tuo catalogo: cerco in SBN…", { origine: "testo", automatico: false }); return; }
+  ultimaRichiesta = { testo: v };
+  Object.assign(ricercaUnica, { testo: v, trovati, vista: "tutti", ordine: "anno", tutte: false });
+  disegnaRicercaUnica();
+}
+function disegnaRicercaUnica() {
+  const r = ricercaUnica;
+  const posseduti = new Set(esemplari.map(e => e.edizione_id));
+  const cercati = new Set(desideri.filter(d => d.edizione_id).map(d => d.edizione_id));
+  const parole = norm(r.testo).split(/\s+/).filter(Boolean);
+  // Autori che corrispondono alla ricerca: un riquadro per autore con tutte le sue schede
+  const perAutore = {};
+  r.trovati.forEach(x => { if (parole.every(p => norm(x.autore).includes(p))) (perAutore[x.autore] = perAutore[x.autore] || []).push(x); });
+  const prezzo = (x) => x.prezzo_max_eur == null ? -1 : Number(x.prezzo_max_eur);
+  let righe = r.trovati.filter(x => r.vista === "tutti" || (r.vista === "ho" ? posseduti.has(x.id) : !posseduti.has(x.id)));
+  righe = righe.slice().sort(r.ordine === "prezzo" ? (a, b) => prezzo(b) - prezzo(a)
+    : (a, b) => a.autore.localeCompare(b.autore, "it") || (a.anno || 9999) - (b.anno || 9999));
+  const visibili = r.tutte ? righe : righe.slice(0, 5);
+  const chip = (k, v, testo) => `<button class="chip ${r[k] === v ? "attivo" : ""}" data-ru-${k}="${v}">${testo}</button>`;
+  let h = `<h3 class="sezione titolo-sezione">Nel tuo catalogo <em>${r.trovati.length} ${r.trovati.length === 1 ? "scheda" : "schede"}</em></h3>`;
+  h += Object.entries(perAutore).map(([a, l]) => {
+    const anni = l.map(x => x.anno).filter(Boolean);
+    const arco = anni.length ? ` · ${Math.min(...anni)}${Math.max(...anni) !== Math.min(...anni) ? "–" + Math.max(...anni) : ""}` : "";
+    return `<button class="gruppo-autore" data-ru-autore="${esc(a)}"><div><b>${esc(a)}</b><small>${l.length} ${l.length === 1 ? "edizione" : "edizioni"} in catalogo${arco} · filtri completi</small></div><span>›</span></button>`;
+  }).join("");
+  h += `<div class="chips-ricerca">${chip("vista", "tutti", "Tutti")}${chip("vista", "ho", "Ce l'ho")}${chip("vista", "manca", "Mi manca")}${chip("ordine", "anno", "Per anno")}${chip("ordine", "prezzo", "Prezzo più alto")}</div>`;
+  h += visibili.length ? visibili.map(x => cartolina(x, posseduti.has(x.id), cercati.has(x.id))).join("") : `<div class="vuoto">Nessuna scheda con questo filtro.</div>`;
+  if (!r.tutte && righe.length > 5) h += `<button class="mostra-tutte" data-ru-tutte="1">Mostra tutte le ${righe.length} ›</button>`;
+  h += `<h3 class="sezione titolo-sezione">Fuori dal catalogo <em>da SBN</em></h3>
+    <button class="fuori-catalogo" id="ru-sbn"><span>Altre edizioni in SBN</span><b>Cerca ›</b></button><div id="ru-fuori"></div>`;
+  $("risultati").innerHTML = h;
+  $("ru-sbn").onclick = () => cerca({ testo: r.testo, forza_sbn: true }, "Cerco in SBN…", { origine: "testo", automatico: false, soloFuori: true, dest: "ru-fuori" });
+}
+$("risultati").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ru-vista],[data-ru-ordine],[data-ru-tutte],[data-ru-autore]");
+  if (!b) return;
+  if (b.dataset.ruAutore) { impostaRicercaCatalogo(b.dataset.ruAutore); vai("catalogo"); return; }
+  if (b.dataset.ruVista) ricercaUnica.vista = b.dataset.ruVista;
+  if (b.dataset.ruOrdine) ricercaUnica.ordine = b.dataset.ruOrdine;
+  if (b.dataset.ruTutte) ricercaUnica.tutte = true;
+  disegnaRicercaUnica();
 });
 
 async function cerca(corpo, messaggio, contesto) {
   ultimaRichiesta = corpo;
-  $("risultati").innerHTML = "";
+  $(contesto && contesto.dest ? contesto.dest : "risultati").innerHTML = "";
   $("stato").textContent = messaggio || "Cerco…";
   let data;
   try { data = await chiama(corpo); }
   catch (e) { $("stato").innerHTML = '<span class="errore">' + esc(e.message) + '</span>'; return; }
-  if (data.google_books_da_telefono && data.chiave_google_books) {
-    try { data.google_books = await googleBooksDalTelefono(data.chiave_google_books); }
-    catch (e) { data.google_books = { errore: "Google Books non raggiungibile (" + e.message + ")" }; }
-  }
+  togliGoogleBooks(data);
   $("stato").textContent = "";
   mostraRisultati(data, contesto || {});
+}
+
+// Google Books non si usa piu': si tolgono i suoi risultati e i dati presi da li'
+function togliGoogleBooks(d) {
+  d.google_books = null;
+  const p = d.scheda_pulita && d.scheda_pulita.in_mano;
+  if (p) {
+    p.campi = (p.campi || []).filter(c => c.fonte !== "Google Books");
+    p.fonti = (p.fonti || []).filter(f => f !== "Google Books");
+    p.collegamenti = (p.collegamenti || []).filter(c => c.nome !== "Google Books");
+  }
 }
 
 async function googleBooksDalTelefono(q) {
@@ -1564,11 +1642,12 @@ async function mostraRisultati(d, contesto) {
   const forti = (d.catalogo || []).filter(x => x.punteggio >= SOGLIA);
   const deboli = (d.catalogo || []).filter(x => x.punteggio < SOGLIA);
   const stessoTitolo = d.stesso_titolo_nel_catalogo || [];
-  const nelCatalogo = forti.length > 0 || stessoTitolo.length > 0;
+  const nelCatalogo = forti.length > 0 || stessoTitolo.length > 0 || !!(contesto && contesto.soloFuori);
 
+  const soloFuori = !!(contesto && contesto.soloFuori);
   h += `<div id="esito-taccuino"></div>`;
-  if (forti.length) h += `<h3 class="sezione">Nel tuo catalogo</h3>` + cartolineCatalogo(forti);
-  if (stessoTitolo.length) h += `<h3 class="sezione">Questo titolo è nel tuo catalogo</h3>` + cartolineCatalogo(stessoTitolo);
+  if (forti.length && !soloFuori) h += `<h3 class="sezione">Nel tuo catalogo</h3>` + cartolineCatalogo(forti);
+  if (stessoTitolo.length && !soloFuori) h += `<h3 class="sezione">Questo titolo è nel tuo catalogo</h3>` + cartolineCatalogo(stessoTitolo);
 
   const s = d.sbn;
   if (s && s.errore) {
@@ -1593,19 +1672,9 @@ async function mostraRisultati(d, contesto) {
     if (!s.edizione_in_mano && !(s.risultati || []).length) h += `<p class="vuoto">Nessun risultato in SBN.</p>`;
   }
 
-  const g = d.google_books;
-  if (g && g.errore) h += `<h3 class="sezione">Google Books</h3><p class="errore">${esc(g.errore)}</p>`;
-  else if (g && (g.risultati || []).length) {
-    h += `<h3 class="sezione">Google Books</h3><p class="avviso">${esc(g.avviso)}</p>` +
-      g.risultati.map(r => `<div class="riga">${r.copertina ? `<img src="${linkSicuro(r.copertina)}" alt="">` : ""}
-        <div><b>${esc(r.titolo)}</b><br>${esc((r.autori || []).join(", "))}<br>
-        <span class="t-meta">${esc([r.editore, r.data].filter(Boolean).join(" · "))}${r.isbn ? " · ISBN " + esc(r.isbn) : ""}</span>
-        ${r.link ? `<br><a href="${linkSicuro(r.link)}" target="_blank" rel="noopener">Apri</a>` : ""}</div></div>`).join("");
-  }
-
-  if (!forti.length && deboli.length) h += `<h3 class="sezione">Forse cercavi</h3>` + cartolineCatalogo(deboli);
-  if (forti.length && !s) h += `<button class="btn btn-tenue" id="anche-fuori">Cerca anche in SBN e Google Books</button>`;
-  $("risultati").innerHTML = h;
+  if (!forti.length && deboli.length && !soloFuori) h += `<h3 class="sezione">Forse cercavi</h3>` + cartolineCatalogo(deboli);
+  if (forti.length && !s && !soloFuori) h += `<button class="btn btn-tenue" id="anche-fuori">Cerca anche in SBN</button>`;
+  $(contesto && contesto.dest ? contesto.dest : "risultati").innerHTML = h;
 
   const b = $("anche-fuori");
   if (b) b.addEventListener("click", () => cerca({ ...ultimaRichiesta, forza_sbn: true }, "Cerco anche fuori dal catalogo…", { ...contesto, automatico: false }));
@@ -1639,7 +1708,7 @@ async function mostraRisultati(d, contesto) {
 // ==================================================================
 let epocaRicerca = "moderno";
 const TESTI_EPOCA = {
-  moderno: { titolo: "Ricerca SBN", intro: "Compila solo i campi che conosci: più campi metti, meno titoli simili ti ritrovi. Le edizioni arrivano dalla più vecchia, così la candidata prima edizione è in cima.", luogo: "es. Torino", da: "1930", a: "1945" },
+  moderno: { titolo: "Ricerca avanzata", intro: "Cerca in SBN (il catalogo delle biblioteche italiane). Compila solo i campi che conosci: più campi metti, meno titoli simili ti ritrovi. Le edizioni arrivano dalla più vecchia, così la candidata prima edizione è in cima.", luogo: "es. Torino", da: "1930", a: "1945" },
   antico: { titolo: "Libro antico", intro: "Per i libri stampati fino al 1830, senza barcode. Scrivi quello che leggi su frontespizio e colophon: l'app cerca solo nel fondo antico di SBN (che include EDIT16) e mostra le edizioni dalla più vecchia.", luogo: "es. Venezia (vale anche Vinegia, Venetiis…)", da: "1500", a: "1600" }
 };
 function impostaEpoca(ep) {
